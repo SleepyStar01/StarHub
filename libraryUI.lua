@@ -1,9 +1,11 @@
--- StarHub UI Library v1.0
--- Dibuat khusus untuk Faris ✨
+-- StarHub UI Library v1.0 ✨
+-- Dibuat untuk Faris Ardiansyah
+-- Tema: Biru gelap / bintang
 
 local StarHub = {}
+local UserInputService = game:GetService("UserInputService")
 
--- Helper function buat Instance
+-- Helper: Create Instance
 local function Create(class, props)
     local inst = Instance.new(class)
     for k,v in pairs(props) do
@@ -12,11 +14,11 @@ local function Create(class, props)
     return inst
 end
 
--- Fungsi buat Window
 function StarHub:CreateWindow(config)
     local Window = {}
     config = config or {}
 
+    -- ScreenGui
     local ScreenGui = Create("ScreenGui", {
         Name = "StarHubUI",
         ResetOnSpawn = false,
@@ -24,13 +26,14 @@ function StarHub:CreateWindow(config)
         Parent = game:GetService("CoreGui")
     })
 
-    -- Frame utama
+    -- Main Frame
     local MainFrame = Create("Frame", {
         Parent = ScreenGui,
         Size = UDim2.new(0, 560, 0, 400),
         Position = UDim2.new(0.5, -280, 0.5, -200),
-        BackgroundColor3 = Color3.fromRGB(15, 20, 35), -- biru gelap
-        BorderSizePixel = 0
+        BackgroundColor3 = Color3.fromRGB(15, 20, 35),
+        BorderSizePixel = 0,
+        Visible = true
     })
     Create("UICorner", { Parent = MainFrame, CornerRadius = UDim.new(0, 12) })
     Create("UIStroke", { Parent = MainFrame, Color = Color3.fromRGB(0, 120, 255), Thickness = 2, Transparency = 0.3 })
@@ -46,7 +49,7 @@ function StarHub:CreateWindow(config)
         TextSize = 20
     })
 
-    -- Sidebar (tab holder)
+    -- Sidebar
     local TabHolder = Create("Frame", {
         Parent = MainFrame,
         Size = UDim2.new(0, 150, 1, -40),
@@ -56,7 +59,7 @@ function StarHub:CreateWindow(config)
     Create("UICorner", { Parent = TabHolder, CornerRadius = UDim.new(0, 8) })
     Create("UIListLayout", { Parent = TabHolder, SortOrder = Enum.SortOrder.LayoutOrder })
 
-    -- Content frame
+    -- Content Frame
     local ContentFrame = Create("Frame", {
         Parent = MainFrame,
         Size = UDim2.new(1, -150, 1, -40),
@@ -64,6 +67,15 @@ function StarHub:CreateWindow(config)
         BackgroundColor3 = Color3.fromRGB(20, 25, 45)
     })
     Create("UICorner", { Parent = ContentFrame, CornerRadius = UDim.new(0, 8) })
+
+    -- Notification Container
+    local NotifyFrame = Create("Frame", {
+        Parent = ScreenGui,
+        Size = UDim2.new(0, 300, 1, 0),
+        Position = UDim2.new(1, -310, 0, 50),
+        BackgroundTransparency = 1
+    })
+    local NotifyList = Create("UIListLayout", { Parent = NotifyFrame, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0,8) })
 
     local Tabs = {}
 
@@ -108,7 +120,6 @@ function StarHub:CreateWindow(config)
                 TextSize = 14
             })
             Create("UICorner", { Parent = Btn, CornerRadius = UDim.new(0, 6) })
-
             Btn.MouseButton1Click:Connect(function()
                 if bConfig.Callback then bConfig.Callback() end
             end)
@@ -172,9 +183,8 @@ function StarHub:CreateWindow(config)
             local Value = sConfig.Default or 0
 
             SliderBtn.MouseButton1Down:Connect(function()
-                local uis = game:GetService("UserInputService")
                 local conn
-                conn = uis.InputChanged:Connect(function(input)
+                conn = UserInputService.InputChanged:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseMovement then
                         local rel = math.clamp((input.Position.X - SliderBtn.AbsolutePosition.X)/SliderBtn.AbsoluteSize.X,0,1)
                         Value = math.floor((sConfig.Min or 0) + ((sConfig.Max or 100)-(sConfig.Min or 0))*rel)
@@ -183,7 +193,7 @@ function StarHub:CreateWindow(config)
                         if sConfig.Callback then sConfig.Callback(Value) end
                     end
                 end)
-                uis.InputEnded:Wait()
+                UserInputService.InputEnded:Wait()
                 conn:Disconnect()
             end)
         end
@@ -202,9 +212,7 @@ function StarHub:CreateWindow(config)
             Create("UICorner", { Parent = Btn, CornerRadius = UDim.new(0, 6) })
 
             Btn.MouseButton1Click:Connect(function()
-                for _,opt in pairs(dConfig.Options or {}) do
-                    print("Pilih:", opt)
-                end
+                StarHub:Notify("Pilihan", "Dropdown belum aktif", 3)
             end)
         end
 
@@ -212,6 +220,55 @@ function StarHub:CreateWindow(config)
         if #Tabs == 1 then TabPage.Visible = true end
         return Elements
     end
+
+    -- Notification
+    function StarHub:Notify(title, msg, duration)
+        duration = duration or 3
+        local Notify = Create("Frame", {
+            Parent = NotifyFrame,
+            Size = UDim2.new(0, 280, 0, 60),
+            BackgroundColor3 = Color3.fromRGB(25, 35, 65),
+            BorderSizePixel = 0
+        })
+        Create("UICorner", { Parent = Notify, CornerRadius = UDim.new(0,8) })
+        Create("UIStroke", { Parent = Notify, Color = Color3.fromRGB(0,120,255), Transparency = 0.5 })
+
+        local Title = Create("TextLabel", {
+            Parent = Notify,
+            Size = UDim2.new(1, -10, 0, 20),
+            Position = UDim2.new(0,5,0,5),
+            BackgroundTransparency = 1,
+            Text = title,
+            TextColor3 = Color3.fromRGB(180,200,255),
+            Font = Enum.Font.GothamBold,
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left
+        })
+
+        local Body = Create("TextLabel", {
+            Parent = Notify,
+            Size = UDim2.new(1, -10, 0, 30),
+            Position = UDim2.new(0,5,0,25),
+            BackgroundTransparency = 1,
+            Text = msg,
+            TextColor3 = Color3.fromRGB(220,230,255),
+            Font = Enum.Font.Gotham,
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Left
+        })
+
+        task.delay(duration, function()
+            Notify:Destroy()
+        end)
+    end
+
+    -- Hotkey toggle
+    local ToggleKey = Enum.KeyCode.RightControl
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if not processed and input.KeyCode == ToggleKey then
+            MainFrame.Visible = not MainFrame.Visible
+        end
+    end)
 
     return Window
 end
