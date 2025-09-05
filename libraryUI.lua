@@ -1,9 +1,9 @@
--- StarHub UI Library
--- Dibuat untuk Faris ✨
+-- StarHub UI Library v1.0
+-- Dibuat khusus untuk Faris ✨
 
 local StarHub = {}
 
--- Utility: Create Instances
+-- Helper function buat Instance
 local function Create(class, props)
     local inst = Instance.new(class)
     for k,v in pairs(props) do
@@ -12,7 +12,7 @@ local function Create(class, props)
     return inst
 end
 
--- Create Window
+-- Fungsi buat Window
 function StarHub:CreateWindow(config)
     local Window = {}
     config = config or {}
@@ -32,11 +32,10 @@ function StarHub:CreateWindow(config)
         BackgroundColor3 = Color3.fromRGB(15, 20, 35), -- biru gelap
         BorderSizePixel = 0
     })
-
     Create("UICorner", { Parent = MainFrame, CornerRadius = UDim.new(0, 12) })
     Create("UIStroke", { Parent = MainFrame, Color = Color3.fromRGB(0, 120, 255), Thickness = 2, Transparency = 0.3 })
 
-    -- Title Bar
+    -- Title
     local TitleBar = Create("TextLabel", {
         Parent = MainFrame,
         Size = UDim2.new(1, 0, 0, 40),
@@ -47,7 +46,7 @@ function StarHub:CreateWindow(config)
         TextSize = 20
     })
 
-    -- Tab Container
+    -- Sidebar (tab holder)
     local TabHolder = Create("Frame", {
         Parent = MainFrame,
         Size = UDim2.new(0, 150, 1, -40),
@@ -55,9 +54,9 @@ function StarHub:CreateWindow(config)
         BackgroundColor3 = Color3.fromRGB(10, 15, 25)
     })
     Create("UICorner", { Parent = TabHolder, CornerRadius = UDim.new(0, 8) })
+    Create("UIListLayout", { Parent = TabHolder, SortOrder = Enum.SortOrder.LayoutOrder })
 
-    local TabList = Create("UIListLayout", { Parent = TabHolder, SortOrder = Enum.SortOrder.LayoutOrder })
-
+    -- Content frame
     local ContentFrame = Create("Frame", {
         Parent = MainFrame,
         Size = UDim2.new(1, -150, 1, -40),
@@ -68,7 +67,6 @@ function StarHub:CreateWindow(config)
 
     local Tabs = {}
 
-    -- Tambah Tab
     function Window:Tab(tabConfig)
         local TabButton = Create("TextButton", {
             Parent = TabHolder,
@@ -137,7 +135,81 @@ function StarHub:CreateWindow(config)
             end)
         end
 
+        -- Slider
+        function Elements:Slider(sConfig)
+            local Frame = Create("Frame", {
+                Parent = TabPage,
+                Size = UDim2.new(0, 200, 0, 40),
+                BackgroundTransparency = 1
+            })
+
+            local Label = Create("TextLabel", {
+                Parent = Frame,
+                Size = UDim2.new(1, 0, 0, 20),
+                Text = (sConfig.Title or "Slider") .. ": " .. (sConfig.Default or 0),
+                TextColor3 = Color3.fromRGB(220, 230, 255),
+                BackgroundTransparency = 1,
+                Font = Enum.Font.Gotham,
+                TextSize = 14
+            })
+
+            local SliderBtn = Create("TextButton", {
+                Parent = Frame,
+                Size = UDim2.new(1, 0, 0, 15),
+                Position = UDim2.new(0,0,0,20),
+                BackgroundColor3 = Color3.fromRGB(25, 35, 65),
+                Text = "",
+            })
+            Create("UICorner", { Parent = SliderBtn, CornerRadius = UDim.new(0, 6) })
+
+            local Fill = Create("Frame", {
+                Parent = SliderBtn,
+                Size = UDim2.new((sConfig.Default or 0)/(sConfig.Max or 100),0,1,0),
+                BackgroundColor3 = Color3.fromRGB(0, 120, 255),
+                BorderSizePixel = 0
+            })
+
+            local Value = sConfig.Default or 0
+
+            SliderBtn.MouseButton1Down:Connect(function()
+                local uis = game:GetService("UserInputService")
+                local conn
+                conn = uis.InputChanged:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseMovement then
+                        local rel = math.clamp((input.Position.X - SliderBtn.AbsolutePosition.X)/SliderBtn.AbsoluteSize.X,0,1)
+                        Value = math.floor((sConfig.Min or 0) + ((sConfig.Max or 100)-(sConfig.Min or 0))*rel)
+                        Fill.Size = UDim2.new(rel,0,1,0)
+                        Label.Text = (sConfig.Title or "Slider")..": "..Value
+                        if sConfig.Callback then sConfig.Callback(Value) end
+                    end
+                end)
+                uis.InputEnded:Wait()
+                conn:Disconnect()
+            end)
+        end
+
+        -- Dropdown
+        function Elements:Dropdown(dConfig)
+            local Btn = Create("TextButton", {
+                Parent = TabPage,
+                Size = UDim2.new(0, 200, 0, 30),
+                Text = dConfig.Title or "Dropdown",
+                BackgroundColor3 = Color3.fromRGB(25, 35, 65),
+                TextColor3 = Color3.fromRGB(220, 230, 255),
+                Font = Enum.Font.Gotham,
+                TextSize = 14
+            })
+            Create("UICorner", { Parent = Btn, CornerRadius = UDim.new(0, 6) })
+
+            Btn.MouseButton1Click:Connect(function()
+                for _,opt in pairs(dConfig.Options or {}) do
+                    print("Pilih:", opt)
+                end
+            end)
+        end
+
         Tabs[#Tabs+1] = { Page = TabPage }
+        if #Tabs == 1 then TabPage.Visible = true end
         return Elements
     end
 
