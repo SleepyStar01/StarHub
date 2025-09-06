@@ -23,7 +23,7 @@ end
 a['2'] = Instance.new('Frame', a['1'])
 a['2'].ZIndex = 0
 a['2'].BorderSizePixel = 2
-a['2'].BackgroundColor3 = Color3.fromRGB(0, 51, 255)
+a['2'].BackgroundColor3 = Color3.fromRGB(30, 32, 40)
 a['2'].AnchorPoint = Vector2.new(0.5, 0.5)
 a['2'].Size = UDim2.new(0, 528, 0, 334)
 a['2'].Position = UDim2.new(0.5278, 0, 0.5, 0)
