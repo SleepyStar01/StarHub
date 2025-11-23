@@ -20,7 +20,7 @@ local NatHub = {};
 
 -- NatHub
 NatHub["1"] = Instance.new("ScreenGui");
-NatHub["1"]["Name"] = [[StarHub]];
+NatHub["1"]["Name"] = [[NatHub]];
 NatHub["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling;
 NatHub["1"]["ResetOnSpawn"] = false;
 
