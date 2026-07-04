@@ -1,7 +1,7 @@
 --[[
-    🌙 SleepyUI Library (Winhub Style Premium Edition)
+    🌙 SleepyUI Library (Winhub Exact Replica Edition)
     An ultra-modern, elegant, accordion-based UI Framework for Roblox
-    Version 3.0.0
+    Version 4.0.0
 ]]
 
 local SleepyUI = {}
@@ -13,28 +13,26 @@ local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
 
--- Default Settings
 local Settings = {
     Theme = {
-        Background = Color3.fromRGB(15, 15, 20), -- Deeper dark
-        Sidebar = Color3.fromRGB(22, 22, 28),
-        Element = Color3.fromRGB(30, 30, 38),
-        ElementHover = Color3.fromRGB(42, 42, 52),
+        Background = Color3.fromRGB(16, 15, 20),
+        Sidebar = Color3.fromRGB(12, 11, 15),
+        Element = Color3.fromRGB(25, 24, 30),
+        ElementHover = Color3.fromRGB(35, 34, 40),
         Accent = Color3.fromRGB(130, 90, 240), -- Winhub Purple
         AccentHover = Color3.fromRGB(150, 110, 255),
-        Text = Color3.fromRGB(250, 250, 250),
-        TextMuted = Color3.fromRGB(140, 140, 150),
-        Border = Color3.fromRGB(45, 45, 55),
-        Success = Color3.fromRGB(67, 181, 129),
+        Text = Color3.fromRGB(240, 240, 240),
+        TextMuted = Color3.fromRGB(130, 130, 140),
+        Border = Color3.fromRGB(35, 35, 45),
+        Success = Color3.fromRGB(130, 90, 240), -- Purple for success
         Danger = Color3.fromRGB(240, 71, 71)
     },
     Font = Enum.Font.GothamMedium,
     TitleFont = Enum.Font.GothamBold,
-    CornerRadius = UDim.new(0, 6), -- General corner
-    PillRadius = UDim.new(1, 0) -- For toggles
+    CornerRadius = UDim.new(0, 6),
+    PillRadius = UDim.new(1, 0)
 }
 
--- Utility: Tweening
 local function CreateTween(instance, properties, duration, style)
     duration = duration or 0.2
     style = style or Enum.EasingStyle.Quart
@@ -72,19 +70,15 @@ local function MakeDraggable(topbarobject, object)
             StartPosition = object.Position
             
             input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    Dragging = false
-                end
+                if input.UserInputState == Enum.UserInputState.End then Dragging = false end
             end)
         end
     end)
-
     topbarobject.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             DragInput = input
         end
     end)
-
     UserInputService.InputChanged:Connect(function(input)
         if input == DragInput and Dragging then
             local Delta = input.Position - DragStart
@@ -95,13 +89,11 @@ end
 
 function SleepyUI:CreateWindow(config)
     config = config or {}
-    local TitleText = config.Name or "Winhub Style UI"
+    local TitleText = config.Name or "discord.gg/winhubx"
     local Theme = config.Theme or Settings.Theme
 
     local UITarget = RunService:IsStudio() and LocalPlayer:WaitForChild("PlayerGui") or CoreGui
-    if UITarget:FindFirstChild("SleepyUI_Lib") then
-        UITarget["SleepyUI_Lib"]:Destroy()
-    end
+    if UITarget:FindFirstChild("SleepyUI_Lib") then UITarget["SleepyUI_Lib"]:Destroy() end
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "SleepyUI_Lib"
@@ -115,7 +107,7 @@ function SleepyUI:CreateWindow(config)
     Shadow.BackgroundTransparency = 1
     Shadow.Image = "rbxassetid://1316045217"
     Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    Shadow.ImageTransparency = 0.4
+    Shadow.ImageTransparency = 0.3
     Shadow.ScaleType = Enum.ScaleType.Slice
     Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
     Shadow.Parent = ScreenGui
@@ -128,59 +120,114 @@ function SleepyUI:CreateWindow(config)
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
     MainFrame.Parent = ScreenGui
-    AddCorner(MainFrame, UDim.new(0, 10))
+    AddCorner(MainFrame, UDim.new(0, 8))
     AddStroke(MainFrame, Theme.Border, 1)
 
     MainFrame:GetPropertyChangedSignal("Position"):Connect(function()
         Shadow.Position = UDim2.new(MainFrame.Position.X.Scale, MainFrame.Position.X.Offset - 25, MainFrame.Position.Y.Scale, MainFrame.Position.Y.Offset - 20)
     end)
 
+    -- Sidebar
     local Sidebar = Instance.new("Frame")
     Sidebar.Name = "Sidebar"
     Sidebar.Size = UDim2.new(0, 200, 1, 0)
     Sidebar.BackgroundColor3 = Theme.Sidebar
     Sidebar.BorderSizePixel = 0
     Sidebar.Parent = MainFrame
+    AddStroke(Sidebar, Theme.Border, 1) -- Add border right
 
-    local SidebarLine = Instance.new("Frame")
-    SidebarLine.Size = UDim2.new(0, 1, 1, 0)
-    SidebarLine.Position = UDim2.new(1, 0, 0, 0)
-    SidebarLine.BackgroundColor3 = Theme.Border
-    SidebarLine.BorderSizePixel = 0
-    SidebarLine.Parent = Sidebar
-
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, -40, 0, 70)
-    Title.Position = UDim2.new(0, 25, 0, 0)
-    Title.BackgroundTransparency = 1
-    Title.Text = TitleText
-    Title.TextColor3 = Theme.Text
-    Title.Font = Settings.TitleFont
-    Title.TextSize = 16
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-    Title.Parent = Sidebar
-
-    MakeDraggable(Title, MainFrame)
+    -- Discord / Title Header
+    local TitleArea = Instance.new("Frame")
+    TitleArea.Size = UDim2.new(1, 0, 0, 50)
+    TitleArea.BackgroundTransparency = 1
+    TitleArea.Parent = Sidebar
+    MakeDraggable(TitleArea, MainFrame)
     MakeDraggable(Sidebar, MainFrame)
 
+    local DiscordIcon = Instance.new("TextLabel")
+    DiscordIcon.Size = UDim2.new(0, 24, 0, 24)
+    DiscordIcon.Position = UDim2.new(0, 15, 0.5, -12)
+    DiscordIcon.BackgroundTransparency = 1
+    DiscordIcon.Text = "👾" -- Placeholder for discord logo
+    DiscordIcon.TextColor3 = Theme.Accent
+    DiscordIcon.TextSize = 16
+    DiscordIcon.Parent = TitleArea
+
+    local TitleLbl = Instance.new("TextLabel")
+    TitleLbl.Size = UDim2.new(1, -50, 1, 0)
+    TitleLbl.Position = UDim2.new(0, 45, 0, 0)
+    TitleLbl.BackgroundTransparency = 1
+    TitleLbl.Text = TitleText
+    TitleLbl.TextColor3 = Theme.Text
+    TitleLbl.Font = Settings.TitleFont
+    TitleLbl.TextSize = 13
+    TitleLbl.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLbl.Parent = TitleArea
+    
+    -- Search Bar
+    local SearchBG = Instance.new("Frame")
+    SearchBG.Size = UDim2.new(1, -30, 0, 30)
+    SearchBG.Position = UDim2.new(0, 15, 0, 50)
+    SearchBG.BackgroundColor3 = Theme.Element
+    SearchBG.Parent = Sidebar
+    AddCorner(SearchBG, UDim.new(0, 4))
+    
+    local SearchIcon = Instance.new("TextLabel")
+    SearchIcon.Size = UDim2.new(0, 25, 1, 0)
+    SearchIcon.Position = UDim2.new(0, 5, 0, 0)
+    SearchIcon.BackgroundTransparency = 1
+    SearchIcon.Text = "🔍"
+    SearchIcon.TextColor3 = Theme.TextMuted
+    SearchIcon.TextSize = 12
+    SearchIcon.Parent = SearchBG
+    
+    local SearchBox = Instance.new("TextBox")
+    SearchBox.Size = UDim2.new(1, -35, 1, 0)
+    SearchBox.Position = UDim2.new(0, 30, 0, 0)
+    SearchBox.BackgroundTransparency = 1
+    SearchBox.Text = "Search"
+    SearchBox.TextColor3 = Theme.TextMuted
+    SearchBox.Font = Settings.Font
+    SearchBox.TextSize = 12
+    SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+    SearchBox.Parent = SearchBG
+
+    -- Tabs Container
     local TabList = Instance.new("ScrollingFrame")
-    TabList.Size = UDim2.new(1, 0, 1, -80)
-    TabList.Position = UDim2.new(0, 0, 0, 70)
+    TabList.Size = UDim2.new(1, 0, 1, -95)
+    TabList.Position = UDim2.new(0, 0, 0, 95)
     TabList.BackgroundTransparency = 1
     TabList.ScrollBarThickness = 0
     TabList.Parent = Sidebar
 
     local TabListLayout = Instance.new("UIListLayout")
-    TabListLayout.Padding = UDim.new(0, 6)
+    TabListLayout.Padding = UDim.new(0, 2)
     TabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     TabListLayout.Parent = TabList
+    
+    local Spacer = Instance.new("Frame")
+    Spacer.Size = UDim2.new(1,0,0,5)
+    Spacer.BackgroundTransparency = 1
+    Spacer.Parent = TabList
 
+    -- Page Container
     local PageContainer = Instance.new("Frame")
     PageContainer.Size = UDim2.new(1, -200, 1, 0)
     PageContainer.Position = UDim2.new(0, 200, 0, 0)
     PageContainer.BackgroundTransparency = 1
     PageContainer.Parent = MainFrame
     MakeDraggable(PageContainer, MainFrame)
+    
+    local ContentTitle = Instance.new("TextLabel")
+    ContentTitle.Size = UDim2.new(1, -40, 0, 50)
+    ContentTitle.Position = UDim2.new(0, 20, 0, 10)
+    ContentTitle.BackgroundTransparency = 1
+    ContentTitle.Text = "Info"
+    ContentTitle.TextColor3 = Theme.Text
+    ContentTitle.Font = Settings.TitleFont
+    ContentTitle.TextSize = 22
+    ContentTitle.TextXAlignment = Enum.TextXAlignment.Left
+    ContentTitle.Parent = PageContainer
 
     local WindowState = {
         CurrentTab = nil,
@@ -194,48 +241,44 @@ function SleepyUI:CreateWindow(config)
         
         function API:CreateSection(text)
             local Sec = Instance.new("TextLabel")
-            Sec.Size = UDim2.new(1, 0, 0, 30)
+            Sec.Size = UDim2.new(1, -20, 0, 35)
+            Sec.Position = UDim2.new(0, 10, 0, 0)
             Sec.BackgroundTransparency = 1
             Sec.Text = text
             Sec.TextColor3 = Theme.Accent
             Sec.Font = Settings.TitleFont
-            Sec.TextSize = 13
+            Sec.TextSize = 12
             Sec.TextXAlignment = Enum.TextXAlignment.Left
             Sec.Parent = ParentFrame
         end
 
         function API:CreateButton(text, callback)
             local BtnFrame = Instance.new("Frame")
-            BtnFrame.Size = UDim2.new(1, -10, 0, 42)
-            BtnFrame.BackgroundColor3 = Theme.Element
+            BtnFrame.Size = UDim2.new(1, -20, 0, 40)
+            BtnFrame.Position = UDim2.new(0, 10, 0, 0)
+            BtnFrame.BackgroundTransparency = 1
             BtnFrame.Parent = ParentFrame
-            AddCorner(BtnFrame, Settings.CornerRadius)
-            local BtnStroke = AddStroke(BtnFrame, Theme.Border, 1)
 
             local Btn = Instance.new("TextButton")
             Btn.Size = UDim2.new(1, 0, 1, 0)
-            Btn.BackgroundTransparency = 1
-            Btn.Text = text
+            Btn.BackgroundColor3 = Theme.Element
+            Btn.Text = " " .. text
             Btn.TextColor3 = Theme.Text
             Btn.Font = Settings.Font
-            Btn.TextSize = 14
+            Btn.TextSize = 13
             Btn.AutoButtonColor = false
+            Btn.TextXAlignment = Enum.TextXAlignment.Left
             Btn.Parent = BtnFrame
+            AddCorner(Btn, UDim.new(0, 4))
+            
+            local BtnStroke = AddStroke(Btn, Theme.Border, 1)
 
-            Btn.MouseEnter:Connect(function()
-                CreateTween(BtnFrame, {BackgroundColor3 = Theme.ElementHover}, 0.2)
-                CreateTween(BtnStroke, {Color = Theme.Accent}, 0.2)
-            end)
-            Btn.MouseLeave:Connect(function()
-                CreateTween(BtnFrame, {BackgroundColor3 = Theme.Element}, 0.2)
-                CreateTween(BtnStroke, {Color = Theme.Border}, 0.2)
-            end)
-            Btn.MouseButton1Down:Connect(function()
-                CreateTween(BtnFrame, {BackgroundColor3 = Theme.AccentHover}, 0.1)
-            end)
-            Btn.MouseButton1Up:Connect(function()
-                CreateTween(BtnFrame, {BackgroundColor3 = Theme.ElementHover}, 0.1)
-                if callback then pcall(callback) end
+            Btn.MouseEnter:Connect(function() CreateTween(Btn, {BackgroundColor3 = Theme.ElementHover}, 0.2) end)
+            Btn.MouseLeave:Connect(function() CreateTween(Btn, {BackgroundColor3 = Theme.Element}, 0.2) end)
+            Btn.MouseButton1Down:Connect(function() CreateTween(BtnStroke, {Color = Theme.Accent}, 0.1) end)
+            Btn.MouseButton1Up:Connect(function() 
+                CreateTween(BtnStroke, {Color = Theme.Border}, 0.1)
+                if callback then pcall(callback) end 
             end)
         end
 
@@ -243,56 +286,59 @@ function SleepyUI:CreateWindow(config)
             local ToggleState = default or false
 
             local TogFrame = Instance.new("TextButton")
-            TogFrame.Size = UDim2.new(1, -10, 0, 42)
-            TogFrame.BackgroundColor3 = Theme.Element
-            TogFrame.AutoButtonColor = false
+            TogFrame.Size = UDim2.new(1, -20, 0, 36)
+            TogFrame.Position = UDim2.new(0, 10, 0, 0)
+            TogFrame.BackgroundTransparency = 1
             TogFrame.Text = ""
             TogFrame.Parent = ParentFrame
-            AddCorner(TogFrame, Settings.CornerRadius)
 
             local Lbl = Instance.new("TextLabel")
-            Lbl.Size = UDim2.new(1, -80, 1, 0)
-            Lbl.Position = UDim2.new(0, 15, 0, 0)
+            Lbl.Size = UDim2.new(1, -70, 1, 0)
             Lbl.BackgroundTransparency = 1
             Lbl.Text = text
-            Lbl.TextColor3 = Theme.Text
+            Lbl.TextColor3 = Theme.TextMuted
             Lbl.Font = Settings.Font
-            Lbl.TextSize = 14
+            Lbl.TextSize = 13
             Lbl.TextXAlignment = Enum.TextXAlignment.Left
             Lbl.Parent = TogFrame
 
             local SwitchBG = Instance.new("Frame")
-            SwitchBG.Size = UDim2.new(0, 42, 0, 22)
-            SwitchBG.Position = UDim2.new(1, -55, 0.5, -11)
-            SwitchBG.BackgroundColor3 = ToggleState and Theme.Accent or Theme.Background
+            SwitchBG.Size = UDim2.new(0, 40, 0, 20)
+            SwitchBG.Position = UDim2.new(1, -40, 0.5, -10)
+            SwitchBG.BackgroundColor3 = ToggleState and Theme.Success or Theme.Element
             SwitchBG.Parent = TogFrame
             AddCorner(SwitchBG, Settings.PillRadius)
             local SwitchStroke = AddStroke(SwitchBG, Theme.Border, 1)
 
             local SwitchCircle = Instance.new("Frame")
-            SwitchCircle.Size = UDim2.new(0, 16, 0, 16)
-            SwitchCircle.Position = UDim2.new(0, ToggleState and 23 or 3, 0.5, -8)
-            SwitchCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            SwitchCircle.Size = UDim2.new(0, 14, 0, 14)
+            SwitchCircle.Position = UDim2.new(0, ToggleState and 23 or 3, 0.5, -7)
+            SwitchCircle.BackgroundColor3 = Theme.Text
             SwitchCircle.Parent = SwitchBG
             AddCorner(SwitchCircle, Settings.PillRadius)
 
             local function FireToggle()
                 ToggleState = not ToggleState
                 if ToggleState then
-                    CreateTween(SwitchBG, {BackgroundColor3 = Theme.Accent}, 0.25)
-                    CreateTween(SwitchCircle, {Position = UDim2.new(0, 23, 0.5, -8)}, 0.25, Enum.EasingStyle.Back)
-                    CreateTween(SwitchStroke, {Color = Theme.Accent}, 0.3)
+                    CreateTween(SwitchBG, {BackgroundColor3 = Theme.Success}, 0.25)
+                    CreateTween(SwitchCircle, {Position = UDim2.new(0, 23, 0.5, -7)}, 0.25, Enum.EasingStyle.Back)
+                    CreateTween(SwitchStroke, {Transparency = 1}, 0.3)
+                    CreateTween(Lbl, {TextColor3 = Theme.Text}, 0.3)
                 else
-                    CreateTween(SwitchBG, {BackgroundColor3 = Theme.Background}, 0.25)
-                    CreateTween(SwitchCircle, {Position = UDim2.new(0, 3, 0.5, -8)}, 0.25, Enum.EasingStyle.Back)
-                    CreateTween(SwitchStroke, {Color = Theme.Border}, 0.3)
+                    CreateTween(SwitchBG, {BackgroundColor3 = Theme.Element}, 0.25)
+                    CreateTween(SwitchCircle, {Position = UDim2.new(0, 3, 0.5, -7)}, 0.25, Enum.EasingStyle.Back)
+                    CreateTween(SwitchStroke, {Transparency = 0}, 0.3)
+                    CreateTween(Lbl, {TextColor3 = Theme.TextMuted}, 0.3)
                 end
                 if callback then pcall(callback, ToggleState) end
             end
 
             TogFrame.MouseButton1Click:Connect(FireToggle)
-            
-            if default and callback then pcall(callback, default) end
+            if default then 
+                SwitchStroke.Transparency = 1
+                Lbl.TextColor3 = Theme.Text
+                if callback then pcall(callback, default) end 
+            end
             
             return {
                 Set = function(self, state)
@@ -306,28 +352,32 @@ function SleepyUI:CreateWindow(config)
             SliderValue = math.floor(SliderValue * 10) / 10
             
             local SFrame = Instance.new("Frame")
-            SFrame.Size = UDim2.new(1, -10, 0, 65)
-            SFrame.BackgroundColor3 = Theme.Element
+            SFrame.Size = UDim2.new(1, -20, 0, 36)
+            SFrame.Position = UDim2.new(0, 10, 0, 0)
+            SFrame.BackgroundTransparency = 1
             SFrame.Parent = ParentFrame
-            AddCorner(SFrame, Settings.CornerRadius)
             
             local Lbl = Instance.new("TextLabel")
-            Lbl.Size = UDim2.new(0.6, 0, 0, 30)
-            Lbl.Position = UDim2.new(0, 15, 0, 5)
+            Lbl.Size = UDim2.new(0.5, 0, 1, 0)
             Lbl.BackgroundTransparency = 1
             Lbl.Text = text
-            Lbl.TextColor3 = Theme.Text
+            Lbl.TextColor3 = Theme.TextMuted
             Lbl.Font = Settings.Font
-            Lbl.TextSize = 14
+            Lbl.TextSize = 13
             Lbl.TextXAlignment = Enum.TextXAlignment.Left
             Lbl.Parent = SFrame
             
-            -- Winhub style: Number Input Box on the right
+            local RightContainer = Instance.new("Frame")
+            RightContainer.Size = UDim2.new(0.5, 0, 1, 0)
+            RightContainer.Position = UDim2.new(0.5, 0, 0, 0)
+            RightContainer.BackgroundTransparency = 1
+            RightContainer.Parent = SFrame
+            
             local ValBoxBG = Instance.new("Frame")
-            ValBoxBG.Size = UDim2.new(0, 50, 0, 24)
-            ValBoxBG.Position = UDim2.new(1, -65, 0, 8)
-            ValBoxBG.BackgroundColor3 = Theme.Background
-            ValBoxBG.Parent = SFrame
+            ValBoxBG.Size = UDim2.new(0, 35, 0, 22)
+            ValBoxBG.Position = UDim2.new(1, -35, 0.5, -11)
+            ValBoxBG.BackgroundColor3 = Theme.Element
+            ValBoxBG.Parent = RightContainer
             AddCorner(ValBoxBG, UDim.new(0, 4))
             AddStroke(ValBoxBG, Theme.Border, 1)
 
@@ -337,14 +387,14 @@ function SleepyUI:CreateWindow(config)
             ValBox.Text = tostring(SliderValue)
             ValBox.TextColor3 = Theme.Text
             ValBox.Font = Settings.Font
-            ValBox.TextSize = 13
+            ValBox.TextSize = 12
             ValBox.Parent = ValBoxBG
             
             local SliderBG = Instance.new("Frame")
-            SliderBG.Size = UDim2.new(1, -30, 0, 6)
-            SliderBG.Position = UDim2.new(0, 15, 0, 45)
-            SliderBG.BackgroundColor3 = Theme.Background
-            SliderBG.Parent = SFrame
+            SliderBG.Size = UDim2.new(1, -45, 0, 4)
+            SliderBG.Position = UDim2.new(0, 0, 0.5, -2)
+            SliderBG.BackgroundColor3 = Theme.Element
+            SliderBG.Parent = RightContainer
             AddCorner(SliderBG, Settings.PillRadius)
             
             local SliderFill = Instance.new("Frame")
@@ -355,15 +405,15 @@ function SleepyUI:CreateWindow(config)
             AddCorner(SliderFill, Settings.PillRadius)
             
             local Thumb = Instance.new("Frame")
-            Thumb.Size = UDim2.new(0, 14, 0, 14)
-            Thumb.Position = UDim2.new(startScale, -7, 0.5, -7)
-            Thumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Thumb.Size = UDim2.new(0, 12, 0, 12)
+            Thumb.Position = UDim2.new(startScale, -6, 0.5, -6)
+            Thumb.BackgroundColor3 = Theme.Text
             Thumb.Parent = SliderBG
             AddCorner(Thumb, Settings.PillRadius)
 
             local SliderBtn = Instance.new("TextButton")
-            SliderBtn.Size = UDim2.new(1, 0, 1, 24)
-            SliderBtn.Position = UDim2.new(0, 0, 0.5, -12)
+            SliderBtn.Size = UDim2.new(1, 0, 1, 20)
+            SliderBtn.Position = UDim2.new(0, 0, 0.5, -10)
             SliderBtn.BackgroundTransparency = 1
             SliderBtn.Text = ""
             SliderBtn.Parent = SliderBG
@@ -373,7 +423,7 @@ function SleepyUI:CreateWindow(config)
             local function UpdateSliderVisuals()
                 local actualPos = math.clamp((SliderValue - min) / (max - min), 0, 1)
                 CreateTween(SliderFill, {Size = UDim2.new(actualPos, 0, 1, 0)}, 0.1)
-                CreateTween(Thumb, {Position = UDim2.new(actualPos, -7, 0.5, -7)}, 0.1)
+                CreateTween(Thumb, {Position = UDim2.new(actualPos, -6, 0.5, -6)}, 0.1)
                 ValBox.Text = tostring(SliderValue)
             end
 
@@ -388,7 +438,7 @@ function SleepyUI:CreateWindow(config)
             SliderBtn.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                     Dragging = true
-                    CreateTween(Thumb, {Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(Thumb.Position.X.Scale, -9, 0.5, -9)}, 0.15)
+                    CreateTween(Thumb, {Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(Thumb.Position.X.Scale, -8, 0.5, -8)}, 0.15)
                     UpdateSlider(input)
                 end
             end)
@@ -404,7 +454,7 @@ function SleepyUI:CreateWindow(config)
                     if Dragging then
                         Dragging = false
                         UpdateSliderVisuals()
-                        CreateTween(Thumb, {Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(Thumb.Position.X.Scale, -7, 0.5, -7)}, 0.15)
+                        CreateTween(Thumb, {Size = UDim2.new(0, 12, 0, 12), Position = UDim2.new(Thumb.Position.X.Scale, -6, 0.5, -6)}, 0.15)
                     end
                 end
             end)
@@ -429,68 +479,68 @@ function SleepyUI:CreateWindow(config)
             local DropdownOpen = false
 
             local DropFrame = Instance.new("Frame")
-            DropFrame.Size = UDim2.new(1, -10, 0, 42)
-            DropFrame.BackgroundColor3 = Theme.Element
+            DropFrame.Size = UDim2.new(1, -20, 0, 36)
+            DropFrame.Position = UDim2.new(0, 10, 0, 0)
+            DropFrame.BackgroundTransparency = 1
             DropFrame.ClipsDescendants = true
             DropFrame.Parent = ParentFrame
-            AddCorner(DropFrame, Settings.CornerRadius)
-            local DropStroke = AddStroke(DropFrame, Theme.Border, 1)
 
             local DropBtn = Instance.new("TextButton")
-            DropBtn.Size = UDim2.new(1, 0, 0, 42)
+            DropBtn.Size = UDim2.new(1, 0, 0, 36)
             DropBtn.BackgroundTransparency = 1
             DropBtn.Text = ""
             DropBtn.Parent = DropFrame
 
             local Lbl = Instance.new("TextLabel")
             Lbl.Size = UDim2.new(0.5, -20, 1, 0)
-            Lbl.Position = UDim2.new(0, 15, 0, 0)
             Lbl.BackgroundTransparency = 1
             Lbl.Text = text
-            Lbl.TextColor3 = Theme.Text
+            Lbl.TextColor3 = Theme.TextMuted
             Lbl.Font = Settings.Font
-            Lbl.TextSize = 14
+            Lbl.TextSize = 13
             Lbl.TextXAlignment = Enum.TextXAlignment.Left
             Lbl.Parent = DropBtn
 
             local SelectedBox = Instance.new("Frame")
             SelectedBox.Size = UDim2.new(0.4, 0, 0, 26)
-            SelectedBox.Position = UDim2.new(0.6, -15, 0.5, -13)
-            SelectedBox.BackgroundColor3 = Theme.Background
+            SelectedBox.Position = UDim2.new(0.6, 0, 0.5, -13)
+            SelectedBox.BackgroundColor3 = Theme.Element
             SelectedBox.Parent = DropBtn
             AddCorner(SelectedBox, UDim.new(0, 4))
-            AddStroke(SelectedBox, Theme.Border, 1)
+            local SelStroke = AddStroke(SelectedBox, Theme.Border, 1)
             
             local SelectedLbl = Instance.new("TextLabel")
-            SelectedLbl.Size = UDim2.new(1, -20, 1, 0)
-            SelectedLbl.Position = UDim2.new(0, 10, 0, 0)
+            SelectedLbl.Size = UDim2.new(1, -25, 1, 0)
+            SelectedLbl.Position = UDim2.new(0, 5, 0, 0)
             SelectedLbl.BackgroundTransparency = 1
             SelectedLbl.Text = CurrentSelection or "Select Options"
             SelectedLbl.TextColor3 = Theme.TextMuted
             SelectedLbl.Font = Settings.Font
-            SelectedLbl.TextSize = 13
-            SelectedLbl.TextXAlignment = Enum.TextXAlignment.Right
+            SelectedLbl.TextSize = 12
+            SelectedLbl.TextXAlignment = Enum.TextXAlignment.Left
             SelectedLbl.Parent = SelectedBox
 
             local Arrow = Instance.new("TextLabel")
-            Arrow.Size = UDim2.new(0, 20, 0, 20)
-            Arrow.Position = UDim2.new(1, -25, 0.5, -10)
+            Arrow.Size = UDim2.new(0, 20, 1, 0)
+            Arrow.Position = UDim2.new(1, -20, 0, 0)
             Arrow.BackgroundTransparency = 1
             Arrow.Text = "▼"
             Arrow.TextColor3 = Theme.TextMuted
             Arrow.Font = Enum.Font.Gotham
-            Arrow.TextSize = 12
-            Arrow.Parent = DropBtn
+            Arrow.TextSize = 10
+            Arrow.Parent = SelectedBox
 
             local OptionContainer = Instance.new("ScrollingFrame")
-            OptionContainer.Size = UDim2.new(1, -20, 0, 0)
-            OptionContainer.Position = UDim2.new(0, 10, 0, 45)
-            OptionContainer.BackgroundTransparency = 1
+            OptionContainer.Size = UDim2.new(0.4, 0, 0, 0)
+            OptionContainer.Position = UDim2.new(0.6, 0, 0, 36)
+            OptionContainer.BackgroundColor3 = Theme.Element
+            OptionContainer.BorderSizePixel = 0
             OptionContainer.ScrollBarThickness = 2
             OptionContainer.Parent = DropFrame
+            AddCorner(OptionContainer, UDim.new(0,4))
+            AddStroke(OptionContainer, Theme.Border, 1)
             
             local OptLayout = Instance.new("UIListLayout")
-            OptLayout.Padding = UDim.new(0, 2)
             OptLayout.Parent = OptionContainer
 
             local function RefreshOptions()
@@ -501,91 +551,106 @@ function SleepyUI:CreateWindow(config)
                 local totalHeight = 0
                 for _, opt in ipairs(options) do
                     local OBtn = Instance.new("TextButton")
-                    OBtn.Size = UDim2.new(1, 0, 0, 28)
-                    OBtn.BackgroundColor3 = Theme.Background
-                    OBtn.BackgroundTransparency = (opt == CurrentSelection) and 0 or 1
-                    OBtn.Text = opt
+                    OBtn.Size = UDim2.new(1, 0, 0, 26)
+                    OBtn.BackgroundColor3 = Theme.ElementHover
+                    OBtn.BackgroundTransparency = 1
+                    OBtn.Text = "  " .. opt
                     OBtn.TextColor3 = (opt == CurrentSelection) and Theme.Accent or Theme.TextMuted
                     OBtn.Font = Settings.Font
-                    OBtn.TextSize = 13
+                    OBtn.TextSize = 12
+                    OBtn.TextXAlignment = Enum.TextXAlignment.Left
                     OBtn.Parent = OptionContainer
-                    AddCorner(OBtn, UDim.new(0, 4))
                     
-                    totalHeight = totalHeight + 30
+                    totalHeight = totalHeight + 26
+
+                    OBtn.MouseEnter:Connect(function() CreateTween(OBtn, {BackgroundTransparency=0}, 0.2) end)
+                    OBtn.MouseLeave:Connect(function() CreateTween(OBtn, {BackgroundTransparency=1}, 0.2) end)
 
                     OBtn.MouseButton1Click:Connect(function()
                         CurrentSelection = opt
                         SelectedLbl.Text = opt
+                        SelectedLbl.TextColor3 = Theme.Text
                         DropdownOpen = false
-                        CreateTween(DropFrame, {Size = UDim2.new(1, -10, 0, 42)}, 0.3)
+                        CreateTween(DropFrame, {Size = UDim2.new(1, -20, 0, 36)}, 0.3)
                         CreateTween(Arrow, {Rotation = 0}, 0.3)
+                        CreateTween(SelStroke, {Color = Theme.Border}, 0.3)
                         RefreshOptions()
                         if callback then pcall(callback, opt) end
                     end)
                 end
-                OptionContainer.Size = UDim2.new(1, -20, 0, math.min(totalHeight, 150))
+                OptionContainer.Size = UDim2.new(0.4, 0, 0, math.min(totalHeight, 120))
                 OptionContainer.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
                 
                 if DropdownOpen then
-                    CreateTween(DropFrame, {Size = UDim2.new(1, -10, 0, 42 + OptionContainer.Size.Y.Offset + 10)}, 0.3)
+                    CreateTween(DropFrame, {Size = UDim2.new(1, -20, 0, 36 + OptionContainer.Size.Y.Offset + 5)}, 0.3)
                 end
             end
             
             DropBtn.MouseButton1Click:Connect(function()
                 DropdownOpen = not DropdownOpen
                 if DropdownOpen then
-                    CreateTween(DropFrame, {Size = UDim2.new(1, -10, 0, 42 + OptionContainer.Size.Y.Offset + 10)}, 0.3)
+                    CreateTween(DropFrame, {Size = UDim2.new(1, -20, 0, 36 + OptionContainer.Size.Y.Offset + 5)}, 0.3)
                     CreateTween(Arrow, {Rotation = 180}, 0.3)
-                    CreateTween(DropStroke, {Color = Theme.Accent}, 0.3)
+                    CreateTween(SelStroke, {Color = Theme.Accent}, 0.3)
                 else
-                    CreateTween(DropFrame, {Size = UDim2.new(1, -10, 0, 42)}, 0.3)
+                    CreateTween(DropFrame, {Size = UDim2.new(1, -20, 0, 36)}, 0.3)
                     CreateTween(Arrow, {Rotation = 0}, 0.3)
-                    CreateTween(DropStroke, {Color = Theme.Border}, 0.3)
+                    CreateTween(SelStroke, {Color = Theme.Border}, 0.3)
                 end
             end)
 
             RefreshOptions()
-            if default and callback then pcall(callback, default) end
+            if default then 
+                SelectedLbl.TextColor3 = Theme.Text
+                if callback then pcall(callback, default) end 
+            end
         end
 
         return API
     end
 
-    function WindowAPI:CreateTab(tabName)
+    function WindowAPI:CreateTab(tabName, iconId)
         local TabBtn = Instance.new("TextButton")
         TabBtn.Name = tabName
-        TabBtn.Size = UDim2.new(0.85, 0, 0, 42)
+        TabBtn.Size = UDim2.new(0.9, 0, 0, 35)
         TabBtn.BackgroundColor3 = Theme.Element
         TabBtn.BackgroundTransparency = 1
-        TabBtn.Text = "   " .. tabName
-        TabBtn.TextColor3 = Theme.TextMuted
-        TabBtn.Font = Settings.Font
-        TabBtn.TextSize = 14
-        TabBtn.TextXAlignment = Enum.TextXAlignment.Left
+        TabBtn.Text = ""
         TabBtn.AutoButtonColor = false
         TabBtn.Parent = TabList
         AddCorner(TabBtn, UDim.new(0, 6))
 
-        local TabIndicator = Instance.new("Frame")
-        TabIndicator.Size = UDim2.new(0, 4, 0, 0)
-        TabIndicator.Position = UDim2.new(0, -6, 0.5, 0)
-        TabIndicator.AnchorPoint = Vector2.new(0, 0.5)
-        TabIndicator.BackgroundColor3 = Theme.Accent
-        TabIndicator.BorderSizePixel = 0
-        TabIndicator.Parent = TabBtn
-        AddCorner(TabIndicator, Settings.PillRadius)
+        local Icon = Instance.new("TextLabel")
+        Icon.Size = UDim2.new(0, 20, 1, 0)
+        Icon.Position = UDim2.new(0, 15, 0, 0)
+        Icon.BackgroundTransparency = 1
+        Icon.Text = iconId or "◈"
+        Icon.TextColor3 = Theme.TextMuted
+        Icon.Font = Settings.TitleFont
+        Icon.TextSize = 14
+        Icon.Parent = TabBtn
+
+        local Lbl = Instance.new("TextLabel")
+        Lbl.Size = UDim2.new(1, -45, 1, 0)
+        Lbl.Position = UDim2.new(0, 40, 0, 0)
+        Lbl.BackgroundTransparency = 1
+        Lbl.Text = tabName
+        Lbl.TextColor3 = Theme.TextMuted
+        Lbl.Font = Settings.Font
+        Lbl.TextSize = 13
+        Lbl.TextXAlignment = Enum.TextXAlignment.Left
+        Lbl.Parent = TabBtn
 
         local Page = Instance.new("ScrollingFrame")
         Page.Name = tabName .. "_Page"
-        Page.Size = UDim2.new(1, -30, 1, -30)
-        Page.Position = UDim2.new(0, 15, 0, 15)
+        Page.Size = UDim2.new(1, 0, 1, -70)
+        Page.Position = UDim2.new(0, 0, 0, 70)
         Page.BackgroundTransparency = 1
         Page.ScrollBarThickness = 0
         Page.Visible = false
         Page.Parent = PageContainer
 
         local PageLayout = Instance.new("UIListLayout")
-        PageLayout.Padding = UDim.new(0, 10)
         PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
         PageLayout.Parent = Page
 
@@ -596,13 +661,16 @@ function SleepyUI:CreateWindow(config)
         local function ActivateTab()
             if WindowState.CurrentTab == tabName then return end
             for name, data in pairs(WindowState.Tabs) do
-                CreateTween(data.Btn, {BackgroundTransparency = 1, TextColor3 = Theme.TextMuted}, 0.3)
-                CreateTween(data.Indicator, {Size = UDim2.new(0, 4, 0, 0)}, 0.3)
+                CreateTween(data.Btn, {BackgroundTransparency = 1}, 0.3)
+                CreateTween(data.Icon, {TextColor3 = Theme.TextMuted}, 0.3)
+                CreateTween(data.Lbl, {TextColor3 = Theme.TextMuted}, 0.3)
                 data.Page.Visible = false
             end
             WindowState.CurrentTab = tabName
-            CreateTween(TabBtn, {BackgroundTransparency = 0.8, TextColor3 = Theme.Text}, 0.3)
-            CreateTween(TabIndicator, {Size = UDim2.new(0, 4, 0.6, 0)}, 0.3)
+            ContentTitle.Text = tabName
+            CreateTween(TabBtn, {BackgroundTransparency = 0}, 0.3)
+            CreateTween(Icon, {TextColor3 = Theme.Text}, 0.3)
+            CreateTween(Lbl, {TextColor3 = Theme.Text}, 0.3)
             Page.Visible = true
             Page.CanvasPosition = Vector2.new(0,0)
         end
@@ -611,19 +679,20 @@ function SleepyUI:CreateWindow(config)
 
         TabBtn.MouseEnter:Connect(function()
             if WindowState.CurrentTab ~= tabName then
-                CreateTween(TabBtn, {TextColor3 = Theme.Text, BackgroundTransparency = 0.9}, 0.2)
+                CreateTween(Icon, {TextColor3 = Theme.Text}, 0.2)
+                CreateTween(Lbl, {TextColor3 = Theme.Text}, 0.2)
             end
         end)
         TabBtn.MouseLeave:Connect(function()
             if WindowState.CurrentTab ~= tabName then
-                CreateTween(TabBtn, {TextColor3 = Theme.TextMuted, BackgroundTransparency = 1}, 0.2)
+                CreateTween(Icon, {TextColor3 = Theme.TextMuted}, 0.2)
+                CreateTween(Lbl, {TextColor3 = Theme.TextMuted}, 0.2)
             end
         end)
 
-        WindowState.Tabs[tabName] = {Btn = TabBtn, Indicator = TabIndicator, Page = Page}
+        WindowState.Tabs[tabName] = {Btn = TabBtn, Icon = Icon, Lbl = Lbl, Page = Page}
         if WindowState.CurrentTab == nil then ActivateTab() end
 
-        -- Standard Tab API (Directly under Tab)
         local TabAPI = CreateComponentAPI(Page)
 
         function TabAPI:Clear()
@@ -632,17 +701,14 @@ function SleepyUI:CreateWindow(config)
             end
         end
 
-        -- Accordion API (Winhub Style Dropdown Category)
-        function TabAPI:CreateAccordion(accordionName)
+        function TabAPI:CreateAccordion(accordionName, iconStr)
             local AccOpen = false
 
             local AccFrame = Instance.new("Frame")
-            AccFrame.Size = UDim2.new(1, -10, 0, 45)
-            AccFrame.BackgroundColor3 = Theme.Element
+            AccFrame.Size = UDim2.new(1, 0, 0, 45)
+            AccFrame.BackgroundTransparency = 1
             AccFrame.ClipsDescendants = true
             AccFrame.Parent = Page
-            AddCorner(AccFrame, Settings.CornerRadius)
-            local AccStroke = AddStroke(AccFrame, Theme.Border, 1)
 
             local AccBtn = Instance.new("TextButton")
             AccBtn.Size = UDim2.new(1, 0, 0, 45)
@@ -650,19 +716,19 @@ function SleepyUI:CreateWindow(config)
             AccBtn.Text = ""
             AccBtn.Parent = AccFrame
 
-            local Icon = Instance.new("TextLabel")
-            Icon.Size = UDim2.new(0, 30, 1, 0)
-            Icon.Position = UDim2.new(0, 10, 0, 0)
-            Icon.BackgroundTransparency = 1
-            Icon.Text = "❖"
-            Icon.TextColor3 = Theme.Accent
-            Icon.Font = Settings.TitleFont
-            Icon.TextSize = 16
-            Icon.Parent = AccBtn
+            local AccIcon = Instance.new("TextLabel")
+            AccIcon.Size = UDim2.new(0, 30, 1, 0)
+            AccIcon.Position = UDim2.new(0, 20, 0, 0)
+            AccIcon.BackgroundTransparency = 1
+            AccIcon.Text = iconStr or "❖"
+            AccIcon.TextColor3 = Theme.Accent
+            AccIcon.Font = Settings.TitleFont
+            AccIcon.TextSize = 14
+            AccIcon.Parent = AccBtn
 
             local Lbl = Instance.new("TextLabel")
             Lbl.Size = UDim2.new(1, -60, 1, 0)
-            Lbl.Position = UDim2.new(0, 40, 0, 0)
+            Lbl.Position = UDim2.new(0, 55, 0, 0)
             Lbl.BackgroundTransparency = 1
             Lbl.Text = accordionName
             Lbl.TextColor3 = Theme.Text
@@ -673,7 +739,7 @@ function SleepyUI:CreateWindow(config)
 
             local Arrow = Instance.new("TextLabel")
             Arrow.Size = UDim2.new(0, 20, 1, 0)
-            Arrow.Position = UDim2.new(1, -30, 0, 0)
+            Arrow.Position = UDim2.new(1, -40, 0, 0)
             Arrow.BackgroundTransparency = 1
             Arrow.Text = "›"
             Arrow.TextColor3 = Theme.TextMuted
@@ -688,14 +754,13 @@ function SleepyUI:CreateWindow(config)
             ContentFrame.Parent = AccFrame
             
             local CLayout = Instance.new("UIListLayout")
-            CLayout.Padding = UDim.new(0, 6)
             CLayout.Parent = ContentFrame
 
             local function UpdateAccordionSize()
                 if AccOpen then
-                    CreateTween(AccFrame, {Size = UDim2.new(1, -10, 0, 45 + CLayout.AbsoluteContentSize.Y + 10)}, 0.3)
+                    CreateTween(AccFrame, {Size = UDim2.new(1, 0, 0, 45 + CLayout.AbsoluteContentSize.Y)}, 0.3)
                 else
-                    CreateTween(AccFrame, {Size = UDim2.new(1, -10, 0, 45)}, 0.3)
+                    CreateTween(AccFrame, {Size = UDim2.new(1, 0, 0, 45)}, 0.3)
                 end
             end
 
@@ -705,10 +770,8 @@ function SleepyUI:CreateWindow(config)
                 AccOpen = not AccOpen
                 if AccOpen then
                     CreateTween(Arrow, {Rotation = 90}, 0.3)
-                    CreateTween(AccStroke, {Color = Theme.Accent}, 0.3)
                 else
                     CreateTween(Arrow, {Rotation = 0}, 0.3)
-                    CreateTween(AccStroke, {Color = Theme.Border}, 0.3)
                 end
                 UpdateAccordionSize()
             end)
