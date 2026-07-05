@@ -359,8 +359,15 @@ function SleepyUI:CreateWindow(config)
             local targetParent = config.Section and config.Section.ContentFrame or Page
             local EFrame = Instance.new("Frame")
             EFrame.Size = UDim2.new(1, 0, 0, config.Desc and 50 or 40)
-            EFrame.BackgroundTransparency = 1
+            EFrame.BackgroundColor3 = Theme.Element
             EFrame.Parent = targetParent
+            local Corner = Instance.new("UICorner")
+            Corner.CornerRadius = UDim.new(0, 6)
+            Corner.Parent = EFrame
+            local Stroke = Instance.new("UIStroke")
+            Stroke.Color = Theme.Border
+            Stroke.Thickness = 1
+            Stroke.Parent = EFrame
             
             local Label = Instance.new("TextLabel")
             Label.Size = UDim2.new(1, -100, 0, 20)
@@ -448,7 +455,7 @@ function SleepyUI:CreateWindow(config)
         
         function TabAPI:Dropdown(config)
             local EFrame = CreateElementFrame(config)
-            local selected = config.Default or config.Values[1] or ""
+            local selected = config.Default or (config.Values and config.Values[1]) or ""
             
             local DropBtn = Instance.new("TextButton")
             DropBtn.Size = UDim2.new(0, 180, 0, 26)
@@ -472,10 +479,20 @@ function SleepyUI:CreateWindow(config)
                 local nextIdx = 1
                 for i, v in ipairs(config.Values) do if v == selected then nextIdx = i + 1 break end end
                 if nextIdx > #config.Values then nextIdx = 1 end
+                if not config.Values or #config.Values == 0 then return end
                 selected = config.Values[nextIdx]
                 DropBtn.Text = selected
                 if config.Callback then pcall(config.Callback, selected) end
             end)
+            
+            return {
+                Refresh = function(newValues)
+                    config.Values = newValues
+                    selected = newValues[1] or "None"
+                    DropBtn.Text = selected
+                    if config.Callback then pcall(config.Callback, selected) end
+                end
+            }
         end
         
         function TabAPI:Slider(config)
