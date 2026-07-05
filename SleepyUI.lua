@@ -652,7 +652,7 @@ function SleepyUI:CreateWindow(config)
                     OptBtn.Size = UDim2.new(1, 0, 0, 26)
                     OptBtn.BackgroundColor3 = Theme.Hover
                     OptBtn.BackgroundTransparency = 1
-                    OptBtn.Text = "   " .. val
+                    OptBtn.Text = val
                     OptBtn.TextColor3 = isSel and Theme.Accent or Theme.TextDim
                     OptBtn.TextSize = 11
                     OptBtn.Font = Enum.Font.Gotham
@@ -660,9 +660,13 @@ function SleepyUI:CreateWindow(config)
                     OptBtn.ZIndex = 102
                     OptBtn.Parent = OptionList
                     
+                    local OptPadding = Instance.new("UIPadding")
+                    OptPadding.PaddingLeft = UDim.new(0, 24)
+                    OptPadding.Parent = OptBtn
+                    
                     local CheckBox = Instance.new("Frame")
                     CheckBox.Size = UDim2.new(0, 10, 0, 10)
-                    CheckBox.Position = UDim2.new(0, 8, 0.5, -5)
+                    CheckBox.Position = UDim2.new(0, -18, 0.5, -5)
                     CheckBox.BackgroundColor3 = isSel and Theme.Accent or Theme.Background
                     CheckBox.ZIndex = 102
                     CheckBox.Parent = OptBtn
@@ -812,7 +816,7 @@ function SleepyUI:CreateWindow(config)
                     OptBtn.Size = UDim2.new(1, 0, 0, 26)
                     OptBtn.BackgroundColor3 = Theme.Hover
                     OptBtn.BackgroundTransparency = 1
-                    OptBtn.Text = "   " .. val
+                    OptBtn.Text = val
                     OptBtn.TextColor3 = isSel and Theme.Accent or Theme.TextDim
                     OptBtn.TextSize = 11
                     OptBtn.Font = Enum.Font.Gotham
@@ -820,9 +824,13 @@ function SleepyUI:CreateWindow(config)
                     OptBtn.ZIndex = 102
                     OptBtn.Parent = OptionList
                     
+                    local OptPadding = Instance.new("UIPadding")
+                    OptPadding.PaddingLeft = UDim.new(0, 24)
+                    OptPadding.Parent = OptBtn
+                    
                     local CheckBox = Instance.new("Frame")
                     CheckBox.Size = UDim2.new(0, 10, 0, 10)
-                    CheckBox.Position = UDim2.new(0, 8, 0.5, -5)
+                    CheckBox.Position = UDim2.new(0, -18, 0.5, -5)
                     CheckBox.BackgroundColor3 = isSel and Theme.Accent or Theme.Background
                     CheckBox.ZIndex = 102
                     CheckBox.Parent = OptBtn
