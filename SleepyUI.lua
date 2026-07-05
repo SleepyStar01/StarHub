@@ -1,7 +1,7 @@
 --[[
-    🌙 SleepyUI Library (Premium Data-Driven Edition)
+    🌙 SleepyUI Library (Premium Winhub Edition)
     An ultra-modern, elegant, and smooth UI Framework for Roblox
-    Version 3.0.0 (Nathub Style)
+    Version 4.0.0 (Winhub Style)
 ]]
 
 local SleepyUI = {}
@@ -12,20 +12,20 @@ local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 
 local Theme = {
-    Background = Color3.fromRGB(20, 18, 25),
-    Sidebar = Color3.fromRGB(15, 13, 20),
-    Accent = Color3.fromRGB(120, 80, 255),
+    Background = Color3.fromRGB(15, 15, 15),
+    Sidebar = Color3.fromRGB(10, 10, 10),
+    Accent = Color3.fromRGB(130, 90, 240), -- Purple Winhub style
     Text = Color3.fromRGB(240, 240, 240),
     TextDim = Color3.fromRGB(150, 150, 150),
-    Element = Color3.fromRGB(25, 23, 30),
-    Border = Color3.fromRGB(35, 33, 45)
+    Element = Color3.fromRGB(35, 35, 40),
+    Border = Color3.fromRGB(45, 45, 50)
 }
 
 function SleepyUI:CreateWindow(config)
-    local title = config.Title or config.Name or "SleepyUI v3"
+    local title = config.Title or config.Name or "SleepyUI v4"
     
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "SleepyUIV3"
+    ScreenGui.Name = "SleepyUIV4"
     local parent = CoreGui:FindFirstChild("RobloxGui") or CoreGui
     if RunService:IsStudio() then parent = Players.LocalPlayer:WaitForChild("PlayerGui") end
     
@@ -34,12 +34,22 @@ function SleepyUI:CreateWindow(config)
     end
     ScreenGui.Parent = parent
 
+    -- Dropdown Overlay Container
+    local Overlay = Instance.new("Frame")
+    Overlay.Name = "DropdownOverlay"
+    Overlay.Size = UDim2.new(1, 0, 1, 0)
+    Overlay.BackgroundTransparency = 1
+    Overlay.ZIndex = 100
+    Overlay.Visible = false
+    Overlay.Parent = ScreenGui
+
     local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 560, 0, 400)
-    MainFrame.Position = UDim2.new(0.5, -280, 0.5, -200)
+    MainFrame.Size = UDim2.new(0, 600, 0, 420)
+    MainFrame.Position = UDim2.new(0.5, -300, 0.5, -210)
     MainFrame.BackgroundColor3 = Theme.Background
+    MainFrame.BackgroundTransparency = 0.05
     MainFrame.BorderSizePixel = 0
-    MainFrame.ClipsDescendants = true
+    MainFrame.ClipsDescendants = false -- Needed for nice shadows, but we clip content elsewhere
     MainFrame.Parent = ScreenGui
 
     local UICorner = Instance.new("UICorner")
@@ -51,9 +61,15 @@ function SleepyUI:CreateWindow(config)
     UIStroke.Thickness = 1
     UIStroke.Parent = MainFrame
 
-    -- Dragging Logic
+    -- Dragging Logic (Only on TopBar)
+    local TopDragBar = Instance.new("Frame")
+    TopDragBar.Size = UDim2.new(1, 0, 0, 50)
+    TopDragBar.BackgroundTransparency = 1
+    TopDragBar.ZIndex = 10
+    TopDragBar.Parent = MainFrame
+
     local dragging, dragInput, dragStart, startPos
-    MainFrame.InputBegan:Connect(function(input)
+    TopDragBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
@@ -63,7 +79,7 @@ function SleepyUI:CreateWindow(config)
             end)
         end
     end)
-    MainFrame.InputChanged:Connect(function(input)
+    TopDragBar.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
     end)
     UserInputService.InputChanged:Connect(function(input)
@@ -77,6 +93,7 @@ function SleepyUI:CreateWindow(config)
     local Sidebar = Instance.new("Frame")
     Sidebar.Size = UDim2.new(0, 160, 1, 0)
     Sidebar.BackgroundColor3 = Theme.Sidebar
+    Sidebar.BackgroundTransparency = 0.1
     Sidebar.BorderSizePixel = 0
     Sidebar.Parent = MainFrame
 
@@ -88,11 +105,19 @@ function SleepyUI:CreateWindow(config)
     SidebarCover.Size = UDim2.new(0, 8, 1, 0)
     SidebarCover.Position = UDim2.new(1, -8, 0, 0)
     SidebarCover.BackgroundColor3 = Theme.Sidebar
+    SidebarCover.BackgroundTransparency = 0.1
     SidebarCover.BorderSizePixel = 0
     SidebarCover.Parent = Sidebar
 
+    local SidebarBorder = Instance.new("Frame")
+    SidebarBorder.Size = UDim2.new(0, 1, 1, 0)
+    SidebarBorder.Position = UDim2.new(1, 0, 0, 0)
+    SidebarBorder.BackgroundColor3 = Theme.Border
+    SidebarBorder.BorderSizePixel = 0
+    SidebarBorder.Parent = Sidebar
+
     local TitleBar = Instance.new("Frame")
-    TitleBar.Size = UDim2.new(1, 0, 0, 45)
+    TitleBar.Size = UDim2.new(1, 0, 0, 50)
     TitleBar.BackgroundTransparency = 1
     TitleBar.Parent = Sidebar
 
@@ -111,28 +136,14 @@ function SleepyUI:CreateWindow(config)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = title
     TitleLabel.TextColor3 = Theme.Text
-    TitleLabel.TextSize = 12
+    TitleLabel.TextSize = 13
     TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Parent = TitleBar
-
-    local SearchBox = Instance.new("TextBox")
-    SearchBox.Size = UDim2.new(1, -20, 0, 26)
-    SearchBox.Position = UDim2.new(0, 10, 0, 45)
-    SearchBox.BackgroundColor3 = Theme.Element
-    SearchBox.Text = "  🔍 Search"
-    SearchBox.TextColor3 = Theme.TextDim
-    SearchBox.TextSize = 12
-    SearchBox.Font = Enum.Font.Gotham
-    SearchBox.TextXAlignment = Enum.TextXAlignment.Left
-    SearchBox.Parent = Sidebar
-    local SearchCorner = Instance.new("UICorner")
-    SearchCorner.CornerRadius = UDim.new(0, 6)
-    SearchCorner.Parent = SearchBox
     
     local TabContainer = Instance.new("ScrollingFrame")
-    TabContainer.Size = UDim2.new(1, 0, 1, -80)
-    TabContainer.Position = UDim2.new(0, 0, 0, 80)
+    TabContainer.Size = UDim2.new(1, 0, 1, -60)
+    TabContainer.Position = UDim2.new(0, 0, 0, 60)
     TabContainer.BackgroundTransparency = 1
     TabContainer.ScrollBarThickness = 0
     TabContainer.Parent = Sidebar
@@ -150,7 +161,7 @@ function SleepyUI:CreateWindow(config)
     ContentArea.Parent = MainFrame
 
     local TopContentBar = Instance.new("Frame")
-    TopContentBar.Size = UDim2.new(1, 0, 0, 45)
+    TopContentBar.Size = UDim2.new(1, 0, 0, 50)
     TopContentBar.BackgroundTransparency = 1
     TopContentBar.Parent = ContentArea
 
@@ -160,15 +171,16 @@ function SleepyUI:CreateWindow(config)
     ContentTitle.BackgroundTransparency = 1
     ContentTitle.Text = "Home"
     ContentTitle.TextColor3 = Theme.Text
-    ContentTitle.TextSize = 16
+    ContentTitle.TextSize = 20
     ContentTitle.Font = Enum.Font.GothamBold
     ContentTitle.TextXAlignment = Enum.TextXAlignment.Left
     ContentTitle.Parent = TopContentBar
 
     local Pages = Instance.new("Frame")
-    Pages.Size = UDim2.new(1, 0, 1, -45)
-    Pages.Position = UDim2.new(0, 0, 0, 45)
+    Pages.Size = UDim2.new(1, 0, 1, -50)
+    Pages.Position = UDim2.new(0, 0, 0, 50)
     Pages.BackgroundTransparency = 1
+    Pages.ClipsDescendants = true
     Pages.Parent = ContentArea
 
     local function ShowPage(page, titleText)
@@ -182,17 +194,13 @@ function SleepyUI:CreateWindow(config)
     local WindowAPI = {}
     local activeTab = nil
     
-    function WindowAPI:SelectTab(index)
-        -- Can be implemented if needed
-    end
-
     function WindowAPI:Tab(tabConfig)
         local tabTitle = tabConfig.Title or "Tab"
         local tabIcon = tabConfig.Icon or "◈"
 
         local TabBtn = Instance.new("TextButton")
-        TabBtn.Size = UDim2.new(1, -10, 0, 35)
-        TabBtn.Position = UDim2.new(0, 5, 0, 0)
+        TabBtn.Size = UDim2.new(1, -16, 0, 36)
+        TabBtn.Position = UDim2.new(0, 8, 0, 0)
         TabBtn.BackgroundColor3 = Theme.Element
         TabBtn.BackgroundTransparency = 1 -- Transparent initially
         TabBtn.Text = ""
@@ -203,7 +211,7 @@ function SleepyUI:CreateWindow(config)
 
         local IconLabel = Instance.new("TextLabel")
         IconLabel.Size = UDim2.new(0, 30, 1, 0)
-        IconLabel.Position = UDim2.new(0, 10, 0, 0)
+        IconLabel.Position = UDim2.new(0, 8, 0, 0)
         IconLabel.BackgroundTransparency = 1
         IconLabel.Text = tabIcon
         IconLabel.TextColor3 = Theme.TextDim
@@ -223,17 +231,17 @@ function SleepyUI:CreateWindow(config)
         TextLabel.Parent = TabBtn
 
         local Page = Instance.new("ScrollingFrame")
-        Page.Size = UDim2.new(1, -20, 1, -10)
-        Page.Position = UDim2.new(0, 10, 0, 0)
+        Page.Size = UDim2.new(1, -30, 1, -10)
+        Page.Position = UDim2.new(0, 15, 0, 0)
         Page.BackgroundTransparency = 1
-        Page.ScrollBarThickness = 2
+        Page.ScrollBarThickness = 3
         Page.ScrollBarImageColor3 = Theme.Accent
         Page.Visible = false
         Page.Parent = Pages
 
         local PageLayout = Instance.new("UIListLayout")
         PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        PageLayout.Padding = UDim.new(0, 5)
+        PageLayout.Padding = UDim.new(0, 6)
         PageLayout.Parent = Page
         
         PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -242,13 +250,15 @@ function SleepyUI:CreateWindow(config)
 
         TabBtn.MouseButton1Click:Connect(function()
             if activeTab then
-                activeTab.Btn.BackgroundTransparency = 1
+                TweenService:Create(activeTab.Btn, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
                 activeTab.Icon.TextColor3 = Theme.TextDim
                 activeTab.Text.TextColor3 = Theme.TextDim
+                activeTab.Text.Font = Enum.Font.Gotham
             end
-            TabBtn.BackgroundTransparency = 0
+            TweenService:Create(TabBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
             IconLabel.TextColor3 = Theme.Accent
             TextLabel.TextColor3 = Theme.Text
+            TextLabel.Font = Enum.Font.GothamBold
             activeTab = {Btn = TabBtn, Icon = IconLabel, Text = TextLabel}
             ShowPage(Page, tabTitle)
         end)
@@ -257,6 +267,7 @@ function SleepyUI:CreateWindow(config)
             TabBtn.BackgroundTransparency = 0
             IconLabel.TextColor3 = Theme.Accent
             TextLabel.TextColor3 = Theme.Text
+            TextLabel.Font = Enum.Font.GothamBold
             activeTab = {Btn = TabBtn, Icon = IconLabel, Text = TextLabel}
             Page.Visible = true
             ContentTitle.Text = tabTitle
@@ -269,19 +280,20 @@ function SleepyUI:CreateWindow(config)
             local isDefault = secConfig.Default
 
             local AccFrame = Instance.new("Frame")
-            AccFrame.Size = UDim2.new(1, 0, 0, 45)
+            AccFrame.Size = UDim2.new(1, 0, 0, 40)
+            AccFrame.BackgroundColor3 = Theme.Element
             AccFrame.BackgroundTransparency = 1
             AccFrame.ClipsDescendants = true
             AccFrame.Parent = Page
-
+            
             local AccBtn = Instance.new("TextButton")
-            AccBtn.Size = UDim2.new(1, 0, 0, 45)
+            AccBtn.Size = UDim2.new(1, 0, 0, 40)
             AccBtn.BackgroundTransparency = 1
             AccBtn.Text = ""
             AccBtn.Parent = AccFrame
 
             local AccIcon = Instance.new("TextLabel")
-            AccIcon.Size = UDim2.new(0, 30, 1, 0)
+            AccIcon.Size = UDim2.new(0, 20, 1, 0)
             AccIcon.BackgroundTransparency = 1
             AccIcon.Text = "❖"
             AccIcon.TextColor3 = Theme.Accent
@@ -291,11 +303,11 @@ function SleepyUI:CreateWindow(config)
 
             local AccTitle = Instance.new("TextLabel")
             AccTitle.Size = UDim2.new(1, -60, 1, 0)
-            AccTitle.Position = UDim2.new(0, 30, 0, 0)
+            AccTitle.Position = UDim2.new(0, 25, 0, 0)
             AccTitle.BackgroundTransparency = 1
             AccTitle.Text = secTitle
             AccTitle.TextColor3 = Theme.Text
-            AccTitle.TextSize = 13
+            AccTitle.TextSize = 14
             AccTitle.Font = Enum.Font.GothamBold
             AccTitle.TextXAlignment = Enum.TextXAlignment.Left
             AccTitle.Parent = AccBtn
@@ -312,22 +324,22 @@ function SleepyUI:CreateWindow(config)
 
             local ContentFrame = Instance.new("Frame")
             ContentFrame.Size = UDim2.new(1, 0, 0, 0)
-            ContentFrame.Position = UDim2.new(0, 0, 0, 45)
+            ContentFrame.Position = UDim2.new(0, 0, 0, 40)
             ContentFrame.BackgroundTransparency = 1
             ContentFrame.Parent = AccFrame
 
             local CLayout = Instance.new("UIListLayout")
             CLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            CLayout.Padding = UDim.new(0, 5)
+            CLayout.Padding = UDim.new(0, 6)
             CLayout.Parent = ContentFrame
             
             local isOpen = false
 
             local function updateSize()
                 if isOpen then
-                    AccFrame.Size = UDim2.new(1, 0, 0, 45 + CLayout.AbsoluteContentSize.Y)
+                    AccFrame.Size = UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 10)
                 else
-                    AccFrame.Size = UDim2.new(1, 0, 0, 45)
+                    AccFrame.Size = UDim2.new(1, 0, 0, 40)
                 end
                 ContentFrame.Size = UDim2.new(1, 0, 0, CLayout.AbsoluteContentSize.Y)
             end
@@ -338,14 +350,14 @@ function SleepyUI:CreateWindow(config)
                 isOpen = not isOpen
                 AccArrow.Text = isOpen and "^" or "v"
                 TweenService:Create(AccFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                    Size = isOpen and UDim2.new(1, 0, 0, 45 + CLayout.AbsoluteContentSize.Y) or UDim2.new(1, 0, 0, 45)
+                    Size = isOpen and UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 10) or UDim2.new(1, 0, 0, 40)
                 }):Play()
             end)
             
             if isDefault then
                 isOpen = true
                 AccArrow.Text = "^"
-                AccFrame.Size = UDim2.new(1, 0, 0, 45 + CLayout.AbsoluteContentSize.Y)
+                AccFrame.Size = UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 10)
             end
 
             return { ContentFrame = ContentFrame, AccFrame = AccFrame, Clear = function()
@@ -358,12 +370,14 @@ function SleepyUI:CreateWindow(config)
         local function CreateElementFrame(config)
             local targetParent = config.Section and config.Section.ContentFrame or Page
             local EFrame = Instance.new("Frame")
-            EFrame.Size = UDim2.new(1, 0, 0, config.Desc and 50 or 40)
+            EFrame.Size = UDim2.new(1, 0, 0, config.Desc and 54 or 42)
             EFrame.BackgroundColor3 = Theme.Element
             EFrame.Parent = targetParent
+            
             local Corner = Instance.new("UICorner")
             Corner.CornerRadius = UDim.new(0, 6)
             Corner.Parent = EFrame
+            
             local Stroke = Instance.new("UIStroke")
             Stroke.Color = Theme.Border
             Stroke.Thickness = 1
@@ -371,7 +385,7 @@ function SleepyUI:CreateWindow(config)
             
             local Label = Instance.new("TextLabel")
             Label.Size = UDim2.new(1, -100, 0, 20)
-            Label.Position = UDim2.new(0, config.Section and 25 or 10, 0, config.Desc and 8 or 10)
+            Label.Position = UDim2.new(0, 15, 0, config.Desc and 8 or 11)
             Label.BackgroundTransparency = 1
             Label.Text = config.Title or "Element"
             Label.TextColor3 = Theme.Text
@@ -383,7 +397,7 @@ function SleepyUI:CreateWindow(config)
             if config.Desc then
                 local Desc = Instance.new("TextLabel")
                 Desc.Size = UDim2.new(1, -100, 0, 15)
-                Desc.Position = UDim2.new(0, config.Section and 25 or 10, 0, 26)
+                Desc.Position = UDim2.new(0, 15, 0, 28)
                 Desc.BackgroundTransparency = 1
                 Desc.Text = config.Desc
                 Desc.TextColor3 = Theme.TextDim
@@ -401,18 +415,23 @@ function SleepyUI:CreateWindow(config)
             local state = config.Default or false
             
             local TogBtn = Instance.new("TextButton")
-            TogBtn.Size = UDim2.new(0, 40, 0, 20)
-            TogBtn.Position = UDim2.new(1, -50, 0.5, -10)
-            TogBtn.BackgroundColor3 = state and Theme.Accent or Theme.Element
+            TogBtn.Size = UDim2.new(0, 42, 0, 22)
+            TogBtn.Position = UDim2.new(1, -55, 0.5, -11)
+            TogBtn.BackgroundColor3 = state and Theme.Accent or Theme.Background
             TogBtn.Text = ""
             TogBtn.Parent = EFrame
             local TogCorner = Instance.new("UICorner")
             TogCorner.CornerRadius = UDim.new(1, 0)
             TogCorner.Parent = TogBtn
+            local TogStroke = Instance.new("UIStroke")
+            TogStroke.Color = Theme.Border
+            TogStroke.Thickness = 1
+            TogStroke.Transparency = state and 1 or 0
+            TogStroke.Parent = TogBtn
             
             local TogCircle = Instance.new("Frame")
             TogCircle.Size = UDim2.new(0, 16, 0, 16)
-            TogCircle.Position = state and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+            TogCircle.Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
             TogCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             TogCircle.Parent = TogBtn
             local CircCorner = Instance.new("UICorner")
@@ -421,8 +440,9 @@ function SleepyUI:CreateWindow(config)
             
             TogBtn.MouseButton1Click:Connect(function()
                 state = not state
-                TweenService:Create(TogBtn, TweenInfo.new(0.2), {BackgroundColor3 = state and Theme.Accent or Theme.Element}):Play()
-                TweenService:Create(TogCircle, TweenInfo.new(0.2), {Position = state and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)}):Play()
+                TweenService:Create(TogBtn, TweenInfo.new(0.2), {BackgroundColor3 = state and Theme.Accent or Theme.Background}):Play()
+                TweenService:Create(TogStroke, TweenInfo.new(0.2), {Transparency = state and 1 or 0}):Play()
+                TweenService:Create(TogCircle, TweenInfo.new(0.2), {Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)}):Play()
                 if config.Callback then pcall(config.Callback, state) end
             end)
         end
@@ -432,8 +452,8 @@ function SleepyUI:CreateWindow(config)
             
             local Btn = Instance.new("TextButton")
             Btn.Size = UDim2.new(0, 100, 0, 26)
-            Btn.Position = UDim2.new(1, -110, 0.5, -13)
-            Btn.BackgroundColor3 = Theme.Element
+            Btn.Position = UDim2.new(1, -115, 0.5, -13)
+            Btn.BackgroundColor3 = Theme.Background
             Btn.Text = "Execute"
             Btn.TextColor3 = Theme.Text
             Btn.Font = Enum.Font.Gotham
@@ -458,11 +478,11 @@ function SleepyUI:CreateWindow(config)
             local selected = config.Default or (config.Values and config.Values[1]) or ""
             
             local DropBtn = Instance.new("TextButton")
-            DropBtn.Size = UDim2.new(0, 180, 0, 26)
-            DropBtn.Position = UDim2.new(1, -190, 0.5, -13)
+            DropBtn.Size = UDim2.new(0, 160, 0, 26)
+            DropBtn.Position = UDim2.new(1, -175, 0.5, -13)
             DropBtn.BackgroundColor3 = Theme.Background
             DropBtn.Text = selected
-            DropBtn.TextColor3 = Theme.Text
+            DropBtn.TextColor3 = Theme.Accent
             DropBtn.TextSize = 12
             DropBtn.Font = Enum.Font.Gotham
             DropBtn.Parent = EFrame
@@ -470,81 +490,32 @@ function SleepyUI:CreateWindow(config)
             DropCorner.CornerRadius = UDim.new(0, 4)
             DropCorner.Parent = DropBtn
             local UIStroke = Instance.new("UIStroke")
-            UIStroke.Color = Theme.Accent
+            UIStroke.Color = Theme.Border
             UIStroke.Thickness = 1
             UIStroke.Parent = DropBtn
             
             DropBtn.MouseButton1Click:Connect(function()
-                -- Simplified dropdown click logic for now
+                if not config.Values or #config.Values == 0 then return end
                 local nextIdx = 1
                 for i, v in ipairs(config.Values) do if v == selected then nextIdx = i + 1 break end end
                 if nextIdx > #config.Values then nextIdx = 1 end
-                if not config.Values or #config.Values == 0 then return end
                 selected = config.Values[nextIdx]
                 DropBtn.Text = selected
                 if config.Callback then pcall(config.Callback, selected) end
             end)
-            
-            return {
-                Refresh = function(newValues)
-                    config.Values = newValues
-                    selected = newValues[1] or "None"
-                    DropBtn.Text = selected
-                    if config.Callback then pcall(config.Callback, selected) end
-                end
-            }
         end
         
-
         function TabAPI:Dropdown(config)
-            local targetParent = config.Section and config.Section.ContentFrame or Page
-            local EFrame = Instance.new("Frame")
-            EFrame.Size = UDim2.new(1, 0, 0, config.Desc and 50 or 40)
-            EFrame.BackgroundColor3 = Theme.Element
-            EFrame.ClipsDescendants = true
-            EFrame.Parent = targetParent
-            local Corner = Instance.new("UICorner")
-            Corner.CornerRadius = UDim.new(0, 6)
-            Corner.Parent = EFrame
-            local Stroke = Instance.new("UIStroke")
-            Stroke.Color = Theme.Border
-            Stroke.Thickness = 1
-            Stroke.Parent = EFrame
-            
-            local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(1, -100, 0, 20)
-            Label.Position = UDim2.new(0, config.Section and 25 or 10, 0, config.Desc and 8 or 10)
-            Label.BackgroundTransparency = 1
-            Label.Text = config.Title or "Element"
-            Label.TextColor3 = Theme.Text
-            Label.TextSize = 13
-            Label.Font = Enum.Font.Gotham
-            Label.TextXAlignment = Enum.TextXAlignment.Left
-            Label.Parent = EFrame
-            
-            if config.Desc then
-                local Desc = Instance.new("TextLabel")
-                Desc.Size = UDim2.new(1, -100, 0, 15)
-                Desc.Position = UDim2.new(0, config.Section and 25 or 10, 0, 26)
-                Desc.BackgroundTransparency = 1
-                Desc.Text = config.Desc
-                Desc.TextColor3 = Theme.TextDim
-                Desc.TextSize = 11
-                Desc.Font = Enum.Font.Gotham
-                Desc.TextXAlignment = Enum.TextXAlignment.Left
-                Desc.Parent = EFrame
-            end
-
+            local EFrame = CreateElementFrame(config)
             local selected = config.Default or (config.Values and config.Values[1]) or ""
             local isOpen = false
-            local baseHeight = config.Desc and 50 or 40
             
             local DropBtn = Instance.new("TextButton")
-            DropBtn.Size = UDim2.new(0, 180, 0, 26)
-            DropBtn.Position = UDim2.new(1, -190, 0, (baseHeight - 26) / 2)
+            DropBtn.Size = UDim2.new(0, 160, 0, 26)
+            DropBtn.Position = UDim2.new(1, -175, 0.5, -13)
             DropBtn.BackgroundColor3 = Theme.Background
             DropBtn.Text = selected
-            DropBtn.TextColor3 = Theme.Text
+            DropBtn.TextColor3 = Theme.Accent
             DropBtn.TextSize = 12
             DropBtn.Font = Enum.Font.Gotham
             DropBtn.Parent = EFrame
@@ -552,7 +523,7 @@ function SleepyUI:CreateWindow(config)
             DropCorner.CornerRadius = UDim.new(0, 4)
             DropCorner.Parent = DropBtn
             local UIStroke = Instance.new("UIStroke")
-            UIStroke.Color = Theme.Accent
+            UIStroke.Color = Theme.Border
             UIStroke.Thickness = 1
             UIStroke.Parent = DropBtn
             
@@ -565,18 +536,25 @@ function SleepyUI:CreateWindow(config)
             DropIcon.TextSize = 12
             DropIcon.Font = Enum.Font.GothamBold
             DropIcon.Parent = DropBtn
-            
+
+            -- Floating List
             local OptionList = Instance.new("ScrollingFrame")
-            OptionList.Size = UDim2.new(0, 180, 0, 0)
-            OptionList.Position = UDim2.new(1, -190, 0, baseHeight)
-            OptionList.BackgroundColor3 = Theme.Background
+            OptionList.BackgroundColor3 = Theme.Element
             OptionList.BorderSizePixel = 0
             OptionList.ScrollBarThickness = 2
             OptionList.ScrollBarImageColor3 = Theme.Accent
-            OptionList.Parent = EFrame
+            OptionList.Visible = false
+            OptionList.ZIndex = 101
+            OptionList.Parent = Overlay
+
             local ListCorner = Instance.new("UICorner")
             ListCorner.CornerRadius = UDim.new(0, 4)
             ListCorner.Parent = OptionList
+
+            local ListStroke = Instance.new("UIStroke")
+            ListStroke.Color = Theme.Border
+            ListStroke.Thickness = 1
+            ListStroke.Parent = OptionList
             
             local ListLayout = Instance.new("UIListLayout")
             ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -594,26 +572,28 @@ function SleepyUI:CreateWindow(config)
                 for _, val in ipairs(config.Values) do
                     local OptBtn = Instance.new("TextButton")
                     OptBtn.Size = UDim2.new(1, 0, 0, 26)
-                    OptBtn.BackgroundColor3 = Theme.Background
+                    OptBtn.BackgroundColor3 = Theme.Element
                     OptBtn.BackgroundTransparency = 1
                     OptBtn.Text = "  " .. val
                     OptBtn.TextColor3 = val == selected and Theme.Accent or Theme.TextDim
                     OptBtn.TextSize = 12
                     OptBtn.Font = Enum.Font.Gotham
                     OptBtn.TextXAlignment = Enum.TextXAlignment.Left
+                    OptBtn.ZIndex = 102
                     OptBtn.Parent = OptionList
                     
                     totalHeight = totalHeight + 26
                     
-                    OptBtn.MouseEnter:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0, BackgroundColor3 = Theme.Element}):Play() end)
-                    OptBtn.MouseLeave:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 1, BackgroundColor3 = Theme.Background}):Play() end)
+                    OptBtn.MouseEnter:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0, BackgroundColor3 = Theme.Background}):Play() end)
+                    OptBtn.MouseLeave:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play() end)
                     
                     OptBtn.MouseButton1Click:Connect(function()
                         selected = val
                         DropBtn.Text = selected
                         isOpen = false
                         DropIcon.Text = "v"
-                        TweenService:Create(EFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, baseHeight)}):Play()
+                        Overlay.Visible = false
+                        OptionList.Visible = false
                         for _, ob in pairs(OptionList:GetChildren()) do
                             if ob:IsA("TextButton") then
                                 ob.TextColor3 = ob.Text:sub(3) == selected and Theme.Accent or Theme.TextDim
@@ -623,20 +603,34 @@ function SleepyUI:CreateWindow(config)
                     end)
                 end
                 OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-                OptionList.Size = UDim2.new(0, 180, 0, math.min(totalHeight, 120))
-                
-                if isOpen then
-                    EFrame.Size = UDim2.new(1, 0, 0, baseHeight + OptionList.Size.Y.Offset + 5)
-                end
+                OptionList.Size = UDim2.new(0, 160, 0, math.min(totalHeight, 150))
             end
             
             DropBtn.MouseButton1Click:Connect(function()
                 if not config.Values or #config.Values == 0 then return end
                 isOpen = not isOpen
                 DropIcon.Text = isOpen and "^" or "v"
-                TweenService:Create(EFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                    Size = isOpen and UDim2.new(1, 0, 0, baseHeight + OptionList.Size.Y.Offset + 5) or UDim2.new(1, 0, 0, baseHeight)
-                }):Play()
+                
+                if isOpen then
+                    Overlay.Visible = true
+                    OptionList.Visible = true
+                    -- Calculate absolute position
+                    local absPos = DropBtn.AbsolutePosition
+                    OptionList.Position = UDim2.new(0, absPos.X, 0, absPos.Y + 30)
+                else
+                    Overlay.Visible = false
+                    OptionList.Visible = false
+                end
+            end)
+            
+            -- Close when clicking outside
+            Overlay.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    isOpen = false
+                    DropIcon.Text = "v"
+                    Overlay.Visible = false
+                    OptionList.Visible = false
+                end
             end)
             
             RefreshOptions()
@@ -658,9 +652,9 @@ function SleepyUI:CreateWindow(config)
             local val = config.Default or min
             
             local SliderBg = Instance.new("Frame")
-            SliderBg.Size = UDim2.new(0, 180, 0, 6)
-            SliderBg.Position = UDim2.new(1, -190, 0.5, -3)
-            SliderBg.BackgroundColor3 = Theme.Element
+            SliderBg.Size = UDim2.new(0, 160, 0, 6)
+            SliderBg.Position = UDim2.new(1, -175, 0.5, -3)
+            SliderBg.BackgroundColor3 = Theme.Background
             SliderBg.Parent = EFrame
             local BgCorner = Instance.new("UICorner")
             BgCorner.CornerRadius = UDim.new(1, 0)
@@ -677,7 +671,7 @@ function SleepyUI:CreateWindow(config)
             
             local ValLabel = Instance.new("TextLabel")
             ValLabel.Size = UDim2.new(0, 30, 0, 20)
-            ValLabel.Position = UDim2.new(1, -230, 0.5, -10)
+            ValLabel.Position = UDim2.new(1, -215, 0.5, -10)
             ValLabel.BackgroundTransparency = 1
             ValLabel.Text = tostring(val)
             ValLabel.TextColor3 = Theme.TextDim
@@ -685,7 +679,6 @@ function SleepyUI:CreateWindow(config)
             ValLabel.Font = Enum.Font.Gotham
             ValLabel.Parent = EFrame
             
-            -- Simplified slider click interaction
             local clickBtn = Instance.new("TextButton")
             clickBtn.Size = UDim2.new(1, 0, 1, 0)
             clickBtn.BackgroundTransparency = 1
@@ -718,7 +711,7 @@ function SleepyUI:CreateWindow(config)
     end
     
     function WindowAPI:Notify(title, text, duration)
-        -- Notification logic
+        -- Can be expanded if needed
     end
     
     return WindowAPI
