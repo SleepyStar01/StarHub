@@ -573,6 +573,166 @@ function SleepyUI:CreateWindow(config)
             end)
         end
         
+
+        function TabAPI:MultiDropdown(config)
+            local EFrame = CreateElementFrame(config)
+            local selected = config.Default or {}
+            if type(selected) ~= "table" then selected = {selected} end
+            local isOpen = false
+            
+            local function getSelectedText()
+                if #selected == 0 then return "Select Options" end
+                return table.concat(selected, ", ")
+            end
+            
+            local DropBtn = Instance.new("TextButton")
+            DropBtn.Size = UDim2.new(0, 150, 0, 26)
+            DropBtn.Position = UDim2.new(1, -160, 0.5, -13)
+            DropBtn.BackgroundColor3 = Theme.Element
+            DropBtn.Text = getSelectedText()
+            DropBtn.TextColor3 = Theme.TextDim
+            DropBtn.TextSize = 11
+            DropBtn.Font = Enum.Font.Gotham
+            DropBtn.TextTruncate = Enum.TextTruncate.AtEnd
+            DropBtn.Parent = EFrame
+            
+            local DropCorner = Instance.new("UICorner")
+            DropCorner.CornerRadius = UDim.new(0, 4)
+            DropCorner.Parent = DropBtn
+            
+            local UIStroke = Instance.new("UIStroke")
+            UIStroke.Color = Theme.Border
+            UIStroke.Thickness = 1
+            UIStroke.Parent = DropBtn
+            
+            local DropIcon = Instance.new("TextLabel")
+            DropIcon.Size = UDim2.new(0, 24, 1, 0)
+            DropIcon.Position = UDim2.new(1, -24, 0, 0)
+            DropIcon.BackgroundTransparency = 1
+            DropIcon.Text = "v"
+            DropIcon.TextColor3 = Theme.TextDim
+            DropIcon.TextSize = 11
+            DropIcon.Font = Enum.Font.GothamBold
+            DropIcon.Parent = DropBtn
+
+            local OptionList = Instance.new("ScrollingFrame")
+            OptionList.BackgroundColor3 = Theme.Element
+            OptionList.BorderSizePixel = 0
+            OptionList.ScrollBarThickness = 2
+            OptionList.ScrollBarImageColor3 = Theme.Accent
+            OptionList.Visible = false
+            OptionList.ZIndex = 101
+            OptionList.Parent = Overlay
+
+            local ListCorner = Instance.new("UICorner")
+            ListCorner.CornerRadius = UDim.new(0, 4)
+            ListCorner.Parent = OptionList
+            
+            local ListStroke = Instance.new("UIStroke")
+            ListStroke.Color = Theme.Border
+            ListStroke.Thickness = 1
+            ListStroke.Parent = OptionList
+            
+            local ListLayout = Instance.new("UIListLayout")
+            ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            ListLayout.Parent = OptionList
+            
+            local function RefreshOptions(newValues)
+                for _, child in pairs(OptionList:GetChildren()) do
+                    if not child:IsA("UIListLayout") then child:Destroy() end
+                end
+                
+                config.Values = newValues or config.Values or {}
+                
+                local totalHeight = 0
+                for _, val in ipairs(config.Values) do
+                    local isSel = table.find(selected, val) ~= nil
+                    
+                    local OptBtn = Instance.new("TextButton")
+                    OptBtn.Size = UDim2.new(1, 0, 0, 26)
+                    OptBtn.BackgroundColor3 = Theme.Hover
+                    OptBtn.BackgroundTransparency = 1
+                    OptBtn.Text = "   " .. val
+                    OptBtn.TextColor3 = isSel and Theme.Accent or Theme.TextDim
+                    OptBtn.TextSize = 11
+                    OptBtn.Font = Enum.Font.Gotham
+                    OptBtn.TextXAlignment = Enum.TextXAlignment.Left
+                    OptBtn.ZIndex = 102
+                    OptBtn.Parent = OptionList
+                    
+                    local CheckBox = Instance.new("Frame")
+                    CheckBox.Size = UDim2.new(0, 10, 0, 10)
+                    CheckBox.Position = UDim2.new(0, 8, 0.5, -5)
+                    CheckBox.BackgroundColor3 = isSel and Theme.Accent or Theme.Background
+                    CheckBox.ZIndex = 102
+                    CheckBox.Parent = OptBtn
+                    local CBStroke = Instance.new("UIStroke")
+                    CBStroke.Color = Theme.Border
+                    CBStroke.Thickness = 1
+                    CBStroke.Parent = CheckBox
+                    
+                    totalHeight = totalHeight + 26
+                    
+                    OptBtn.MouseEnter:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play() end)
+                    OptBtn.MouseLeave:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play() end)
+                    
+                    OptBtn.MouseButton1Click:Connect(function()
+                        local idx = table.find(selected, val)
+                        if idx then
+                            table.remove(selected, idx)
+                            OptBtn.TextColor3 = Theme.TextDim
+                            TweenService:Create(CheckBox, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Background}):Play()
+                        else
+                            table.insert(selected, val)
+                            OptBtn.TextColor3 = Theme.Accent
+                            TweenService:Create(CheckBox, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Accent}):Play()
+                        end
+                        DropBtn.Text = getSelectedText()
+                        if config.Callback then pcall(config.Callback, selected) end
+                    end)
+                end
+                OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 156))
+            end
+            
+            DropBtn.MouseButton1Click:Connect(function()
+                if not config.Values or #config.Values == 0 then return end
+                isOpen = not isOpen
+                DropIcon.Text = isOpen and "^" or "v"
+                
+                if isOpen then
+                    Overlay.Visible = true
+                    OptionList.Visible = true
+                    local absPos = DropBtn.AbsolutePosition
+                    OptionList.Position = UDim2.new(0, absPos.X, 0, absPos.Y + 30)
+                else
+                    Overlay.Visible = false
+                    OptionList.Visible = false
+                end
+            end)
+            
+            Overlay.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    isOpen = false
+                    DropIcon.Text = "v"
+                    Overlay.Visible = false
+                    OptionList.Visible = false
+                end
+            end)
+            
+            RefreshOptions()
+            
+            local control = {}
+            function control:Refresh(newValues)
+                selected = config.Default or {}
+                if type(selected) ~= "table" then selected = {selected} end
+                DropBtn.Text = getSelectedText()
+                RefreshOptions(newValues)
+                if config.Callback then pcall(config.Callback, selected) end
+            end
+            return control
+        end
+
         function TabAPI:Dropdown(config)
             local EFrame = CreateElementFrame(config)
             local selected = config.Default or (config.Values and config.Values[1]) or ""
