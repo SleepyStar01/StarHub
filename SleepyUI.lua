@@ -453,7 +453,7 @@ function SleepyUI:CreateWindow(config)
             end)
         end
         
-        function TabAPI:Dropdown(config)
+        function TabAPI:Cycle(config)
             local EFrame = CreateElementFrame(config)
             local selected = config.Default or (config.Values and config.Values[1]) or ""
             
@@ -495,6 +495,162 @@ function SleepyUI:CreateWindow(config)
             }
         end
         
+
+        function TabAPI:Dropdown(config)
+            local targetParent = config.Section and config.Section.ContentFrame or Page
+            local EFrame = Instance.new("Frame")
+            EFrame.Size = UDim2.new(1, 0, 0, config.Desc and 50 or 40)
+            EFrame.BackgroundColor3 = Theme.Element
+            EFrame.ClipsDescendants = true
+            EFrame.Parent = targetParent
+            local Corner = Instance.new("UICorner")
+            Corner.CornerRadius = UDim.new(0, 6)
+            Corner.Parent = EFrame
+            local Stroke = Instance.new("UIStroke")
+            Stroke.Color = Theme.Border
+            Stroke.Thickness = 1
+            Stroke.Parent = EFrame
+            
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(1, -100, 0, 20)
+            Label.Position = UDim2.new(0, config.Section and 25 or 10, 0, config.Desc and 8 or 10)
+            Label.BackgroundTransparency = 1
+            Label.Text = config.Title or "Element"
+            Label.TextColor3 = Theme.Text
+            Label.TextSize = 13
+            Label.Font = Enum.Font.Gotham
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = EFrame
+            
+            if config.Desc then
+                local Desc = Instance.new("TextLabel")
+                Desc.Size = UDim2.new(1, -100, 0, 15)
+                Desc.Position = UDim2.new(0, config.Section and 25 or 10, 0, 26)
+                Desc.BackgroundTransparency = 1
+                Desc.Text = config.Desc
+                Desc.TextColor3 = Theme.TextDim
+                Desc.TextSize = 11
+                Desc.Font = Enum.Font.Gotham
+                Desc.TextXAlignment = Enum.TextXAlignment.Left
+                Desc.Parent = EFrame
+            end
+
+            local selected = config.Default or (config.Values and config.Values[1]) or ""
+            local isOpen = false
+            local baseHeight = config.Desc and 50 or 40
+            
+            local DropBtn = Instance.new("TextButton")
+            DropBtn.Size = UDim2.new(0, 180, 0, 26)
+            DropBtn.Position = UDim2.new(1, -190, 0, (baseHeight - 26) / 2)
+            DropBtn.BackgroundColor3 = Theme.Background
+            DropBtn.Text = selected
+            DropBtn.TextColor3 = Theme.Text
+            DropBtn.TextSize = 12
+            DropBtn.Font = Enum.Font.Gotham
+            DropBtn.Parent = EFrame
+            local DropCorner = Instance.new("UICorner")
+            DropCorner.CornerRadius = UDim.new(0, 4)
+            DropCorner.Parent = DropBtn
+            local UIStroke = Instance.new("UIStroke")
+            UIStroke.Color = Theme.Accent
+            UIStroke.Thickness = 1
+            UIStroke.Parent = DropBtn
+            
+            local DropIcon = Instance.new("TextLabel")
+            DropIcon.Size = UDim2.new(0, 20, 1, 0)
+            DropIcon.Position = UDim2.new(1, -20, 0, 0)
+            DropIcon.BackgroundTransparency = 1
+            DropIcon.Text = "v"
+            DropIcon.TextColor3 = Theme.TextDim
+            DropIcon.TextSize = 12
+            DropIcon.Font = Enum.Font.GothamBold
+            DropIcon.Parent = DropBtn
+            
+            local OptionList = Instance.new("ScrollingFrame")
+            OptionList.Size = UDim2.new(0, 180, 0, 0)
+            OptionList.Position = UDim2.new(1, -190, 0, baseHeight)
+            OptionList.BackgroundColor3 = Theme.Background
+            OptionList.BorderSizePixel = 0
+            OptionList.ScrollBarThickness = 2
+            OptionList.ScrollBarImageColor3 = Theme.Accent
+            OptionList.Parent = EFrame
+            local ListCorner = Instance.new("UICorner")
+            ListCorner.CornerRadius = UDim.new(0, 4)
+            ListCorner.Parent = OptionList
+            
+            local ListLayout = Instance.new("UIListLayout")
+            ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            ListLayout.Parent = OptionList
+            
+            local function RefreshOptions(newValues)
+                for _, child in pairs(OptionList:GetChildren()) do
+                    if not child:IsA("UIListLayout") then child:Destroy() end
+                end
+                
+                config.Values = newValues or config.Values
+                if not config.Values then config.Values = {} end
+                
+                local totalHeight = 0
+                for _, val in ipairs(config.Values) do
+                    local OptBtn = Instance.new("TextButton")
+                    OptBtn.Size = UDim2.new(1, 0, 0, 26)
+                    OptBtn.BackgroundColor3 = Theme.Background
+                    OptBtn.BackgroundTransparency = 1
+                    OptBtn.Text = "  " .. val
+                    OptBtn.TextColor3 = val == selected and Theme.Accent or Theme.TextDim
+                    OptBtn.TextSize = 12
+                    OptBtn.Font = Enum.Font.Gotham
+                    OptBtn.TextXAlignment = Enum.TextXAlignment.Left
+                    OptBtn.Parent = OptionList
+                    
+                    totalHeight = totalHeight + 26
+                    
+                    OptBtn.MouseEnter:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0, BackgroundColor3 = Theme.Element}):Play() end)
+                    OptBtn.MouseLeave:Connect(function() TweenService:Create(OptBtn, TweenInfo.new(0.2), {BackgroundTransparency = 1, BackgroundColor3 = Theme.Background}):Play() end)
+                    
+                    OptBtn.MouseButton1Click:Connect(function()
+                        selected = val
+                        DropBtn.Text = selected
+                        isOpen = false
+                        DropIcon.Text = "v"
+                        TweenService:Create(EFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, baseHeight)}):Play()
+                        for _, ob in pairs(OptionList:GetChildren()) do
+                            if ob:IsA("TextButton") then
+                                ob.TextColor3 = ob.Text:sub(3) == selected and Theme.Accent or Theme.TextDim
+                            end
+                        end
+                        if config.Callback then pcall(config.Callback, selected) end
+                    end)
+                end
+                OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+                OptionList.Size = UDim2.new(0, 180, 0, math.min(totalHeight, 120))
+                
+                if isOpen then
+                    EFrame.Size = UDim2.new(1, 0, 0, baseHeight + OptionList.Size.Y.Offset + 5)
+                end
+            end
+            
+            DropBtn.MouseButton1Click:Connect(function()
+                if not config.Values or #config.Values == 0 then return end
+                isOpen = not isOpen
+                DropIcon.Text = isOpen and "^" or "v"
+                TweenService:Create(EFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                    Size = isOpen and UDim2.new(1, 0, 0, baseHeight + OptionList.Size.Y.Offset + 5) or UDim2.new(1, 0, 0, baseHeight)
+                }):Play()
+            end)
+            
+            RefreshOptions()
+            
+            return {
+                Refresh = function(newValues)
+                    selected = (newValues and newValues[1]) or "None"
+                    DropBtn.Text = selected
+                    RefreshOptions(newValues)
+                    if config.Callback then pcall(config.Callback, selected) end
+                end
+            }
+        end
+
         function TabAPI:Slider(config)
             local EFrame = CreateElementFrame(config)
             local min = config.Min or 0
