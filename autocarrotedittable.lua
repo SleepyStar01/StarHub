@@ -1,3 +1,33 @@
+getgenv().WisHUBCarrotConfig = getgenv().WisHUBCarrotConfig or {
+	AutoPlant = true,
+	PlantSeed = "Carrot",
+
+	AutoHarvest = true,
+	HarvestBelowKg = 50,
+
+	AutoSell = true,
+	AutoSprinkler = true,
+	HidePlantsExceptCarrot = true,
+	Rollback = getgenv().WisHUBCarrotDisableRollbackNextRun ~= true,
+	AutoRejoin = true,
+	RejoinSeed = "Auto",
+	RejoinCheckInterval = 3,
+	RejoinDelay = 8,
+	RelogIfLoadingStuck = true,
+	LoadingStuckDelay = 35,
+	LoadingStuckRelogDelay = 2,
+	Speed = 0.1,
+	Webhook = "",
+
+	Sprinklers = {
+		["Super Sprinkler"] = true,
+		["Common Sprinkler"] = false,
+		["Uncommon Sprinkler"] = false,
+		["Rare Sprinkler"] = false,
+		["Legendary Sprinkler"] = false,
+	},
+}
+
 getgenv().WisHUBCarrotDisableRollbackNextRun = false
 
 if not game:IsLoaded() then
@@ -1873,7 +1903,10 @@ local function startLoadingStuckRelogWatchdog()
 end
 
 local function sendDiscordWebhook(foundKg)
-	local url = "https://discord.com/api/webhooks/1326168286345564201/qATgO3zKARUxOBJjaMu5JK7d-74U38070hkqqHnJmC5_C0d9VExZu7EjTdajEQgKw6Yo"
+	local url = cfgString("Webhook", "")
+	if url == "" then
+		return
+	end
 	local data = {
 		["content"] = string.format("🎉 **Harvester Alert!** 🎉\nBerhasil menemukan target Carrot seberat **%.2f Kg**! Rollback telah dimatikan dan player di-kick.", foundKg or 0),
 		["username"] = "Carrot Notifier"
