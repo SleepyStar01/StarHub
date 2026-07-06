@@ -1934,17 +1934,18 @@ local function startRollbackRejoinMonitor()
 	safeSpawn("rejoin", function()
 		task.wait(cfgNumber("RejoinDelay", 8, 0))
 		while isCurrentRun() and cfgBool("AutoRejoin", false) do
+			local hasWanted, foundKg = gardenHasWantedCarrot()
+			if hasWanted then
+				disableRollbackOnce()
+				sendDiscordWebhook(foundKg)
+				task.wait(1)
+				player:Kick(string.format("Berhasil menemukan target Carrot seberat %.2f Kg! Rollback dimatikan.", foundKg or 0))
+				return
+			end
+
 			local seedName = getRejoinSeedName()
 			local noSprinklers = #getPlacedSprinklers() == 0
 			if isSeedInventoryEmpty(seedName) or noSprinklers then
-				local hasWanted, foundKg = gardenHasWantedCarrot()
-				if hasWanted then
-					disableRollbackOnce()
-					sendDiscordWebhook(foundKg)
-					task.wait(1)
-					player:Kick(string.format("Berhasil menemukan target Carrot seberat %.2f Kg! Rollback dimatikan.", foundKg or 0))
-					return
-				end
 				rejoinGame()
 				return
 			end
