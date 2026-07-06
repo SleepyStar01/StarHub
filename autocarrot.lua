@@ -34,11 +34,19 @@ if not game:IsLoaded() then
 end
 
 local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+while not player do
+	task.wait()
+	player = Players.LocalPlayer
+end
+
+if not player.Character then
+	player.CharacterAdded:Wait()
+end
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-
-local player = Players.LocalPlayer
-local remote = ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent")
+local remote = ReplicatedStorage:WaitForChild("SharedModules", 9e9):WaitForChild("Packet", 9e9):WaitForChild("RemoteEvent", 9e9)
 
 local Env = (type(getgenv) == "function" and getgenv()) or _G
 Env.WisHUBCarrotRunId = (tonumber(Env.WisHUBCarrotRunId) or 0) + 1
