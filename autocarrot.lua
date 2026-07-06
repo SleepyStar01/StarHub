@@ -1819,11 +1819,7 @@ local function gardenHasWantedCarrot()
 end
 
 local function rejoinGame()
-	if #game.JobId > 0 then
-		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
-	else
-		TeleportService:Teleport(game.PlaceId, player)
-	end
+	TeleportService:Teleport(game.PlaceId, player)
 end
 
 local function queueRollbackOffNextRun()
@@ -1977,11 +1973,7 @@ local function setupAutoReconnect()
 		
 		task.wait(3) -- Wait a bit to ensure session lock clears before re-rejoining
 		pcall(function()
-			if #game.JobId > 0 then
-				TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
-			else
-				TeleportService:Teleport(game.PlaceId, player)
-			end
+			TeleportService:Teleport(game.PlaceId, player)
 		end)
 	end)
 end
