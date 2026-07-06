@@ -51,9 +51,13 @@ local function setupAutoReconnect()
 			return
 		end
 		
-		task.wait(3)
-		pcall(function()
-			TeleportService:Teleport(game.PlaceId, player)
+		task.spawn(function()
+			while true do
+				task.wait(5) -- Looping teleport setiap 5 detik sampai benar-benar berhasil masuk
+				pcall(function()
+					TeleportService:Teleport(game.PlaceId, player)
+				end)
+			end
 		end)
 	end)
 end
