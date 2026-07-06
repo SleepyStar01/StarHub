@@ -41,8 +41,29 @@ while not player do
 	player = Players.LocalPlayer
 end
 
+local TeleportService = game:GetService("TeleportService")
+
+local function setupAutoReconnect()
+	local GuiService = game:GetService("GuiService")
+	
+	GuiService.ErrorMessageChanged:Connect(function(errorMessage)
+		if type(errorMessage) == "string" and errorMessage:lower():find("berhasil menemukan target") then
+			return
+		end
+		
+		task.wait(3)
+		pcall(function()
+			TeleportService:Teleport(game.PlaceId, player)
+		end)
+	end)
+end
+setupAutoReconnect()
+
 if not player.Character then
-	player.CharacterAdded:Wait()
+	-- Gunakan delay atau bypass wait jika error
+	task.spawn(function()
+		player.CharacterAdded:Wait()
+	end)
 end
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1965,25 +1986,7 @@ local function applyNoUiConfig()
 	state.selectedSprinklers = cfgSelectedSprinklers()
 end
 
-local function setupAutoReconnect()
-	local GuiService = game:GetService("GuiService")
-	local TeleportService = game:GetService("TeleportService")
-	
-	GuiService.ErrorMessageChanged:Connect(function(errorMessage)
-		-- Jangan rejoin jika di-kick karena berhasil menemukan target
-		if type(errorMessage) == "string" and errorMessage:lower():find("berhasil menemukan target") then
-			return
-		end
-		
-		task.wait(3) -- Wait a bit to ensure session lock clears before re-rejoining
-		pcall(function()
-			TeleportService:Teleport(game.PlaceId, player)
-		end)
-	end)
-end
-
 local function boot()
-	setupAutoReconnect()
 	applyNoUiConfig()
 	startLoadingStuckRelogWatchdog()
 
