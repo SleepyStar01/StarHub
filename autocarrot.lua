@@ -1960,7 +1960,25 @@ local function applyNoUiConfig()
 	state.selectedSprinklers = cfgSelectedSprinklers()
 end
 
+local function setupAutoReconnect()
+	local GuiService = game:GetService("GuiService")
+	local TeleportService = game:GetService("TeleportService")
+	
+	GuiService.ErrorMessageChanged:Connect(function(errorMessage)
+		-- Jangan rejoin jika di-kick karena berhasil menemukan target
+		if type(errorMessage) == "string" and errorMessage:lower():find("berhasil menemukan target") then
+			return
+		end
+		
+		task.wait(3) -- Wait a bit to ensure session lock clears before re-rejoining
+		pcall(function()
+			TeleportService:Teleport(game.PlaceId)
+		end)
+	end)
+end
+
 local function boot()
+	setupAutoReconnect()
 	applyNoUiConfig()
 	startLoadingStuckRelogWatchdog()
 
