@@ -29,12 +29,16 @@ getgenv().WisHUBCarrotConfig = {
 
 getgenv().WisHUBCarrotDisableRollbackNextRun = false
 
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 
 local player = Players.LocalPlayer
-local remote = ReplicatedStorage.SharedModules.Packet.RemoteEvent
+local remote = ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent")
 
 local Env = (type(getgenv) == "function" and getgenv()) or _G
 Env.WisHUBCarrotRunId = (tonumber(Env.WisHUBCarrotRunId) or 0) + 1
@@ -1708,7 +1712,7 @@ local function disableRollbackOnce(force)
 	if not force and not rollbackActive then
 		return false
 	end
-	local packetRemote = ReplicatedStorage.SharedModules.Packet.RemoteEvent
+	local packetRemote = remote or ReplicatedStorage:WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent")
 	if not packetRemote then
 		return false
 	end
