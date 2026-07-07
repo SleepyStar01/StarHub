@@ -18,6 +18,7 @@ getgenv().WisHUBCarrotConfig = getgenv().WisHUBCarrotConfig or {
 	LoadingStuckRelogDelay = 2,
 	Speed = 0.1,
 	Webhook = "",
+	DiscordUserId = "", -- Isi ID Discord untuk ping (Opsional)
 
 	Sprinklers = {
 		["Super Sprinkler"] = true,
@@ -76,6 +77,7 @@ local remote = ReplicatedStorage:WaitForChild("SharedModules", 9e9):WaitForChild
 
 local Env = (type(getgenv) == "function" and getgenv()) or _G
 Env.WisHUBCarrotRunId = (tonumber(Env.WisHUBCarrotRunId) or 0) + 1
+Env.WisHUBStartTime = Env.WisHUBStartTime or os.time()
 local RUN_ID = Env.WisHUBCarrotRunId
 
 local Config = Env.WisHUBCarrotConfig
@@ -1927,7 +1929,7 @@ local function startLoadingStuckRelogWatchdog()
 	end)
 end
 
-local function sendDiscordWebhook(foundKg)
+local function sendDiscordWebhook(foundKg, elapsedStr)
 	local url = cfgString("Webhook", "")
 	if url == "" then
 		return
@@ -1951,6 +1953,11 @@ local function sendDiscordWebhook(foundKg)
 					["inline"] = true
 				},
 				{
+					["name"] = "Elapsed Time",
+					["value"] = tostring(elapsedStr),
+					["inline"] = true
+				},
+				{
 					["name"] = "Status",
 					["value"] = "Rollback disabled. Disconnected safely.",
 					["inline"] = false
@@ -1962,6 +1969,12 @@ local function sendDiscordWebhook(foundKg)
 			}
 		}}
 	}
+	
+	local pingId = cfgString("DiscordUserId", "")
+	if pingId ~= "" then
+		data["content"] = "<@" .. pingId .. ">"
+	end
+	
 	local req = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 	if req then
 		pcall(function()
@@ -1987,10 +2000,16 @@ local function startRollbackRejoinMonitor()
 		while isCurrentRun() and cfgBool("AutoRejoin", false) do
 			local hasWanted, foundKg = gardenHasWantedCarrot()
 			if hasWanted then
+				local elapsedSecs = os.time() - (Env.WisHUBStartTime or os.time())
+				local h = math.floor(elapsedSecs / 3600)
+				local m = math.floor((elapsedSecs % 3600) / 60)
+				local elapsedStr = string.format("%dh %dm", h, m)
+				if h == 0 and m == 0 then elapsedStr = elapsedSecs .. "s" end
+
 				disableRollbackOnce()
-				sendDiscordWebhook(foundKg)
+				sendDiscordWebhook(foundKg, elapsedStr)
 				task.wait(1)
-				player:Kick(string.format("Berhasil menemukan target Carrot seberat %.2f Kg! Rollback dimatikan.", foundKg or 0))
+				player:Kick(string.format("Berhasil menemukan target Carrot seberat %.2f Kg!\n\nDurasi Farming: %s\nRollback dimatikan.", foundKg or 0, elapsedStr))
 				return
 			end
 
