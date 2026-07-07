@@ -1933,8 +1933,34 @@ local function sendDiscordWebhook(foundKg)
 		return
 	end
 	local data = {
-		["content"] = string.format("🎉 **Harvester Alert!** 🎉\nBerhasil menemukan target Carrot seberat **%.2f Kg**! Rollback telah dimatikan dan player di-kick.", foundKg or 0),
-		["username"] = "Carrot Notifier"
+		["username"] = "StarHub",
+		["embeds"] = {{
+			["title"] = "Target Acquired",
+			["description"] = "The desired Carrot has been successfully found.",
+			["type"] = "rich",
+			["color"] = tonumber(0xFFA500), -- Orange color for carrot
+			["fields"] = {
+				{
+					["name"] = "Player",
+					["value"] = "||" .. tostring(player.Name) .. "||",
+					["inline"] = true
+				},
+				{
+					["name"] = "Carrot Weight",
+					["value"] = string.format("**%.2f Kg**", foundKg or 0),
+					["inline"] = true
+				},
+				{
+					["name"] = "Status",
+					["value"] = "Rollback disabled. Disconnected safely.",
+					["inline"] = false
+				}
+			},
+			["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+			["footer"] = {
+				["text"] = "StarHub Automator"
+			}
+		}}
 	}
 	local req = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 	if req then
