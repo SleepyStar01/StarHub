@@ -1212,13 +1212,14 @@ function PulseUI:CreateWindow(config)
 
             local function selectedText()
                 if #selected == 0 then return "Select Options" end
-                return table.concat(selected, ", ")
+                if #selected == 1 then return selected[1] end
+                return #selected .. " Options Selected"
             end
 
             local DropBtn = new("TextButton", {
                 Size = UDim2.new(0, 180, 0, 28), Position = UDim2.new(1, -190, 0.5, -14), BackgroundColor3 = Theme.ElementAlt,
                 Text = "  " .. selectedText(), TextColor3 = Theme.Text, TextSize = 11, Font = Enum.Font.GothamMedium,
-                TextTruncate = Enum.TextTruncate.AtEnd, TextXAlignment = Enum.TextXAlignment.Left,
+                ClipsDescendants = true, TextXAlignment = Enum.TextXAlignment.Left,
             }, EFrame)
             corner(DropBtn, UDim.new(0, 6))
             stroke(DropBtn)
