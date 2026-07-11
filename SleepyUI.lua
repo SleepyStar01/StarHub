@@ -1042,8 +1042,15 @@ function SleepyUI:CreateWindow(config)
 
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 and isOpen then
-                    -- only close if click was outside popup
                     local mp = UserInputService:GetMouseLocation()
+                    
+                    local sp = Swatch.AbsolutePosition
+                    local ss = Swatch.AbsoluteSize
+                    local mPos = input.Position
+                    if mPos.X >= sp.X and mPos.X <= sp.X + ss.X and mPos.Y >= sp.Y and mPos.Y <= sp.Y + ss.Y then
+                        return -- Let Swatch handle it
+                    end
+
                     local pp, ps = Popup.AbsolutePosition, Popup.AbsoluteSize
                     if mp.X < pp.X or mp.X > pp.X + ps.X or mp.Y < pp.Y or mp.Y > pp.Y + ps.Y then
                         isOpen = false
@@ -1220,6 +1227,22 @@ function SleepyUI:CreateWindow(config)
 
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local mPos = input.Position
+                    
+                    local dPos = DropBtn.AbsolutePosition
+                    local dSize = DropBtn.AbsoluteSize
+                    if mPos.X >= dPos.X and mPos.X <= dPos.X + dSize.X and
+                       mPos.Y >= dPos.Y and mPos.Y <= dPos.Y + dSize.Y then
+                        return -- Let DropBtn handle its own click
+                    end
+
+                    local oPos = OptionList.AbsolutePosition
+                    local oSize = OptionList.AbsoluteSize
+                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
+                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
+                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
+                    end
+                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
@@ -1367,6 +1390,22 @@ function SleepyUI:CreateWindow(config)
 
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local mPos = input.Position
+                    
+                    local dPos = DropBtn.AbsolutePosition
+                    local dSize = DropBtn.AbsoluteSize
+                    if mPos.X >= dPos.X and mPos.X <= dPos.X + dSize.X and
+                       mPos.Y >= dPos.Y and mPos.Y <= dPos.Y + dSize.Y then
+                        return -- Let DropBtn handle its own click
+                    end
+
+                    local oPos = OptionList.AbsolutePosition
+                    local oSize = OptionList.AbsoluteSize
+                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
+                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
+                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
+                    end
+                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
