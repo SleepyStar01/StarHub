@@ -1028,8 +1028,13 @@ function SleepyUI:CreateWindow(config)
             }, Overlay)
             addCorner(OptionList, UDim.new(0, 4))
             addStroke(OptionList)
-            new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }, OptionList)
-
+            local ListLayout = new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }, OptionList)
+            
+            ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                local h = ListLayout.AbsoluteContentSize.Y
+                OptionList.CanvasSize = UDim2.new(0, 0, 0, h)
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(h, 156))
+            end)
             local SearchBox = new("TextBox", {
                 Size = UDim2.new(1, -10, 0, 26),
                 Position = UDim2.new(0, 5, 0, 0),
@@ -1152,6 +1157,14 @@ function SleepyUI:CreateWindow(config)
 
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local mPos = input.Position
+                    local oPos = OptionList.AbsolutePosition
+                    local oSize = OptionList.AbsoluteSize
+                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
+                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
+                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
+                    end
+                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
@@ -1299,6 +1312,14 @@ function SleepyUI:CreateWindow(config)
 
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local mPos = input.Position
+                    local oPos = OptionList.AbsolutePosition
+                    local oSize = OptionList.AbsoluteSize
+                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
+                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
+                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
+                    end
+                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
