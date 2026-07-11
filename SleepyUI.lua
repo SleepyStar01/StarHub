@@ -12,9 +12,9 @@ local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 
 local Theme = {
-    Background = Color3.fromRGB(15, 15, 20), -- Deep dark, similar to Wishub
-    TopBar = Color3.fromRGB(15, 15, 20), 
-    Sidebar = Color3.fromRGB(15, 15, 20),
+    Background = Color3.fromRGB(10, 10, 14), -- Deep dark, similar to Wishub
+    TopBar = Color3.fromRGB(10, 10, 14), 
+    Sidebar = Color3.fromRGB(10, 10, 14),
     Accent = Color3.fromRGB(255, 160, 20), -- Star Gold
     Text = Color3.fromRGB(255, 255, 255),
     TextDim = Color3.fromRGB(140, 140, 150),
@@ -62,7 +62,7 @@ function SleepyUI:CreateWindow(config)
     MinStar.Text = "⭐"
     MinStar.TextColor3 = Color3.fromRGB(255, 255, 255)
     MinStar.TextSize = 22
-    MinStar.Font = Enum.Font.GothamBold
+    MinStar.Font = Enum.Font.GothamMediumBold
     MinStar.Parent = MinIcon
     
     local dragMin, dragMinInput, dragMinStart, startMinPos
@@ -84,7 +84,7 @@ function SleepyUI:CreateWindow(config)
     MainFrame.Size = UDim2.new(0, 600, 0, 380) -- Perfect balanced size
     MainFrame.Position = UDim2.new(0.5, -300, 0.5, -190)
     MainFrame.BackgroundColor3 = Theme.Background
-    MainFrame.BackgroundTransparency = 0.02
+    MainFrame.BackgroundTransparency = 0.10
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
     MainFrame.Active = true
@@ -113,7 +113,7 @@ function SleepyUI:CreateWindow(config)
     Logo.Text = "⭐"
     Logo.TextColor3 = Theme.Accent
     Logo.TextSize = 18
-    Logo.Font = Enum.Font.GothamBold
+    Logo.Font = Enum.Font.GothamMediumBold
     Logo.ZIndex = 10
     Logo.Parent = TopBar
     
@@ -137,7 +137,7 @@ function SleepyUI:CreateWindow(config)
     TitleLabel.Text = title
     TitleLabel.TextColor3 = Theme.Text
     TitleLabel.TextSize = 11
-    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.Font = Enum.Font.GothamMediumBold
     TitleLabel.ZIndex = 10
     TitleLabel.Parent = TitlePill
     
@@ -149,7 +149,7 @@ function SleepyUI:CreateWindow(config)
     CloseBtn.Text = "✕"
     CloseBtn.TextColor3 = Theme.TextDim
     CloseBtn.TextSize = 14
-    CloseBtn.Font = Enum.Font.GothamBold
+    CloseBtn.Font = Enum.Font.GothamMediumBold
     CloseBtn.ZIndex = 10
     CloseBtn.Parent = TopBar
     CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 80, 80)}):Play() end)
@@ -162,7 +162,7 @@ function SleepyUI:CreateWindow(config)
     MinBtn.Text = "—"
     MinBtn.TextColor3 = Theme.TextDim
     MinBtn.TextSize = 14
-    MinBtn.Font = Enum.Font.GothamBold
+    MinBtn.Font = Enum.Font.GothamMediumBold
     MinBtn.ZIndex = 10
     MinBtn.Parent = TopBar
     MinBtn.MouseEnter:Connect(function() TweenService:Create(MinBtn, TweenInfo.new(0.2), {TextColor3 = Theme.Text}):Play() end)
@@ -249,7 +249,7 @@ function SleepyUI:CreateWindow(config)
     ContentTitle.Text = "Home"
     ContentTitle.TextColor3 = Theme.Text
     ContentTitle.TextSize = 20
-    ContentTitle.Font = Enum.Font.GothamBold
+    ContentTitle.Font = Enum.Font.GothamMediumBold
     ContentTitle.TextXAlignment = Enum.TextXAlignment.Left
     ContentTitle.Parent = TopContentBar
 
@@ -291,7 +291,7 @@ function SleepyUI:CreateWindow(config)
         IconLabel.Text = tabIcon
         IconLabel.TextColor3 = Theme.TextDim
         IconLabel.TextSize = 14
-        IconLabel.Font = Enum.Font.Gotham
+        IconLabel.Font = Enum.Font.GothamMedium
         IconLabel.Parent = TabBtn
 
         local TextLabel = Instance.new("TextLabel")
@@ -301,7 +301,7 @@ function SleepyUI:CreateWindow(config)
         TextLabel.Text = tabTitle
         TextLabel.TextColor3 = Theme.TextDim
         TextLabel.TextSize = 12
-        TextLabel.Font = Enum.Font.Gotham
+        TextLabel.Font = Enum.Font.GothamMedium
         TextLabel.TextXAlignment = Enum.TextXAlignment.Left
         TextLabel.Parent = TabBtn
 
@@ -328,12 +328,12 @@ function SleepyUI:CreateWindow(config)
                 TweenService:Create(activeTab.Btn, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
                 activeTab.Icon.TextColor3 = Theme.TextDim
                 activeTab.Text.TextColor3 = Theme.TextDim
-                activeTab.Text.Font = Enum.Font.Gotham
+                activeTab.Text.Font = Enum.Font.GothamMedium
             end
             TweenService:Create(TabBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.85}):Play()
             IconLabel.TextColor3 = Theme.Accent
             TextLabel.TextColor3 = Theme.Text
-            TextLabel.Font = Enum.Font.GothamBold
+            TextLabel.Font = Enum.Font.GothamMediumBold
             activeTab = {Btn = TabBtn, Icon = IconLabel, Text = TextLabel}
             ShowPage(Page, tabTitle)
         end)
@@ -342,7 +342,7 @@ function SleepyUI:CreateWindow(config)
             TabBtn.BackgroundTransparency = 0.85
             IconLabel.TextColor3 = Theme.Accent
             TextLabel.TextColor3 = Theme.Text
-            TextLabel.Font = Enum.Font.GothamBold
+            TextLabel.Font = Enum.Font.GothamMediumBold
             activeTab = {Btn = TabBtn, Icon = IconLabel, Text = TextLabel}
             Page.Visible = true
             ContentTitle.Text = tabTitle
@@ -382,7 +382,7 @@ function SleepyUI:CreateWindow(config)
             AccTitle.Text = secTitle
             AccTitle.TextColor3 = Theme.Text
             AccTitle.TextSize = 13
-            AccTitle.Font = Enum.Font.GothamBold
+            AccTitle.Font = Enum.Font.GothamMediumBold
             AccTitle.TextXAlignment = Enum.TextXAlignment.Left
             AccTitle.Parent = AccBtn
 
@@ -393,7 +393,7 @@ function SleepyUI:CreateWindow(config)
             AccArrow.Text = "v"
             AccArrow.TextColor3 = Theme.TextDim
             AccArrow.TextSize = 12
-            AccArrow.Font = Enum.Font.GothamBold
+            AccArrow.Font = Enum.Font.GothamMediumBold
             AccArrow.Parent = AccBtn
 
             local ContentFrame = Instance.new("Frame")
@@ -456,7 +456,7 @@ function SleepyUI:CreateWindow(config)
             Label.Text = config.Title or "Element"
             Label.TextColor3 = Theme.Text
             Label.TextSize = 13
-            Label.Font = Enum.Font.GothamBold
+            Label.Font = Enum.Font.GothamMediumBold
             Label.TextXAlignment = Enum.TextXAlignment.Left
             Label.Parent = EFrame
             
@@ -468,7 +468,7 @@ function SleepyUI:CreateWindow(config)
                 Desc.Text = config.Desc
                 Desc.TextColor3 = Theme.TextDim
                 Desc.TextSize = 10
-                Desc.Font = Enum.Font.Gotham
+                Desc.Font = Enum.Font.GothamMedium
                 Desc.TextXAlignment = Enum.TextXAlignment.Left
                 Desc.Parent = EFrame
             end
@@ -520,7 +520,7 @@ function SleepyUI:CreateWindow(config)
             Btn.BackgroundColor3 = Theme.Element
             Btn.Text = "Execute"
             Btn.TextColor3 = Theme.Text
-            Btn.Font = Enum.Font.Gotham
+            Btn.Font = Enum.Font.GothamMedium
             Btn.TextSize = 12
             Btn.Parent = EFrame
             local BtnCorner = Instance.new("UICorner")
@@ -553,7 +553,7 @@ function SleepyUI:CreateWindow(config)
             DropBtn.Text = selected
             DropBtn.TextColor3 = Theme.TextDim
             DropBtn.TextSize = 11
-            DropBtn.Font = Enum.Font.Gotham
+            DropBtn.Font = Enum.Font.GothamMedium
             DropBtn.Parent = EFrame
             local DropCorner = Instance.new("UICorner")
             DropCorner.CornerRadius = UDim.new(0, 4)
@@ -593,7 +593,7 @@ function SleepyUI:CreateWindow(config)
             DropBtn.Text = getSelectedText()
             DropBtn.TextColor3 = Theme.TextDim
             DropBtn.TextSize = 11
-            DropBtn.Font = Enum.Font.Gotham
+            DropBtn.Font = Enum.Font.GothamMedium
             DropBtn.TextTruncate = Enum.TextTruncate.AtEnd
             DropBtn.Parent = EFrame
             
@@ -613,7 +613,7 @@ function SleepyUI:CreateWindow(config)
             DropIcon.Text = "v"
             DropIcon.TextColor3 = Theme.TextDim
             DropIcon.TextSize = 11
-            DropIcon.Font = Enum.Font.GothamBold
+            DropIcon.Font = Enum.Font.GothamMediumBold
             DropIcon.Parent = DropBtn
 
             local OptionList = Instance.new("ScrollingFrame")
@@ -638,6 +638,11 @@ function SleepyUI:CreateWindow(config)
             ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
             ListLayout.Parent = OptionList
             
+            ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                local h = ListLayout.AbsoluteContentSize.Y
+                OptionList.CanvasSize = UDim2.new(0, 0, 0, h)
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(h, 156))
+            end)
             local SearchBox = Instance.new("TextBox")
             SearchBox.Size = UDim2.new(1, -10, 0, 26)
             SearchBox.Position = UDim2.new(0, 5, 0, 0)
@@ -648,7 +653,7 @@ function SleepyUI:CreateWindow(config)
             SearchBox.TextColor3 = Theme.Text
             SearchBox.PlaceholderColor3 = Theme.TextDim
             SearchBox.TextSize = 11
-            SearchBox.Font = Enum.Font.Gotham
+            SearchBox.Font = Enum.Font.GothamMedium
             SearchBox.TextXAlignment = Enum.TextXAlignment.Left
             SearchBox.LayoutOrder = -1
             SearchBox.Parent = OptionList
@@ -688,7 +693,7 @@ function SleepyUI:CreateWindow(config)
                     OptBtn.Text = val
                     OptBtn.TextColor3 = isSel and Theme.Accent or Theme.TextDim
                     OptBtn.TextSize = 11
-                    OptBtn.Font = Enum.Font.Gotham
+                    OptBtn.Font = Enum.Font.GothamMedium
                     OptBtn.TextXAlignment = Enum.TextXAlignment.Left
                     OptBtn.ZIndex = 102
                     OptBtn.Parent = OptionList
@@ -755,6 +760,14 @@ function SleepyUI:CreateWindow(config)
             
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local mPos = input.Position
+                    local oPos = OptionList.AbsolutePosition
+                    local oSize = OptionList.AbsoluteSize
+                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
+                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
+                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
+                    end
+                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
@@ -795,7 +808,7 @@ function SleepyUI:CreateWindow(config)
             DropBtn.Text = getSelectedText()
             DropBtn.TextColor3 = Theme.TextDim
             DropBtn.TextSize = 11
-            DropBtn.Font = Enum.Font.Gotham
+            DropBtn.Font = Enum.Font.GothamMedium
             DropBtn.TextTruncate = Enum.TextTruncate.AtEnd
             DropBtn.Parent = EFrame
             
@@ -815,7 +828,7 @@ function SleepyUI:CreateWindow(config)
             DropIcon.Text = "v"
             DropIcon.TextColor3 = Theme.TextDim
             DropIcon.TextSize = 11
-            DropIcon.Font = Enum.Font.GothamBold
+            DropIcon.Font = Enum.Font.GothamMediumBold
             DropIcon.Parent = DropBtn
 
             local OptionList = Instance.new("ScrollingFrame")
@@ -858,7 +871,7 @@ function SleepyUI:CreateWindow(config)
                     OptBtn.Text = val
                     OptBtn.TextColor3 = isSel and Theme.Accent or Theme.TextDim
                     OptBtn.TextSize = 11
-                    OptBtn.Font = Enum.Font.Gotham
+                    OptBtn.Font = Enum.Font.GothamMedium
                     OptBtn.TextXAlignment = Enum.TextXAlignment.Left
                     OptBtn.ZIndex = 102
                     OptBtn.Parent = OptionList
@@ -952,7 +965,7 @@ function SleepyUI:CreateWindow(config)
             DropBtn.Text = selected
             DropBtn.TextColor3 = Theme.TextDim
             DropBtn.TextSize = 11
-            DropBtn.Font = Enum.Font.Gotham
+            DropBtn.Font = Enum.Font.GothamMedium
             DropBtn.Parent = EFrame
             local DropCorner = Instance.new("UICorner")
             DropCorner.CornerRadius = UDim.new(0, 4)
@@ -969,7 +982,7 @@ function SleepyUI:CreateWindow(config)
             DropIcon.Text = "v"
             DropIcon.TextColor3 = Theme.TextDim
             DropIcon.TextSize = 11
-            DropIcon.Font = Enum.Font.GothamBold
+            DropIcon.Font = Enum.Font.GothamMediumBold
             DropIcon.Parent = DropBtn
 
             -- Floating List
@@ -995,6 +1008,11 @@ function SleepyUI:CreateWindow(config)
             ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
             ListLayout.Parent = OptionList
             
+            ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                local h = ListLayout.AbsoluteContentSize.Y
+                OptionList.CanvasSize = UDim2.new(0, 0, 0, h)
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(h, 156))
+            end)
             local SearchBox = Instance.new("TextBox")
             SearchBox.Size = UDim2.new(1, -10, 0, 26)
             SearchBox.Position = UDim2.new(0, 5, 0, 0)
@@ -1005,7 +1023,7 @@ function SleepyUI:CreateWindow(config)
             SearchBox.TextColor3 = Theme.Text
             SearchBox.PlaceholderColor3 = Theme.TextDim
             SearchBox.TextSize = 11
-            SearchBox.Font = Enum.Font.Gotham
+            SearchBox.Font = Enum.Font.GothamMedium
             SearchBox.TextXAlignment = Enum.TextXAlignment.Left
             SearchBox.LayoutOrder = -1
             SearchBox.Parent = OptionList
@@ -1044,7 +1062,7 @@ function SleepyUI:CreateWindow(config)
                     OptBtn.Text = "  " .. val
                     OptBtn.TextColor3 = val == selected and Theme.Accent or Theme.TextDim
                     OptBtn.TextSize = 11
-                    OptBtn.Font = Enum.Font.Gotham
+                    OptBtn.Font = Enum.Font.GothamMedium
                     OptBtn.TextXAlignment = Enum.TextXAlignment.Left
                     OptBtn.ZIndex = 102
                     OptBtn.Parent = OptionList
@@ -1096,6 +1114,14 @@ function SleepyUI:CreateWindow(config)
             
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    local mPos = input.Position
+                    local oPos = OptionList.AbsolutePosition
+                    local oSize = OptionList.AbsoluteSize
+                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
+                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
+                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
+                    end
+                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
@@ -1155,7 +1181,7 @@ function SleepyUI:CreateWindow(config)
             TextBox.PlaceholderText = placeholder
             TextBox.TextColor3 = Theme.TextDim
             TextBox.TextSize = 11
-            TextBox.Font = Enum.Font.Gotham
+            TextBox.Font = Enum.Font.GothamMedium
             TextBox.TextXAlignment = Enum.TextXAlignment.Left
             TextBox.ClearTextOnFocus = false
             TextBox.Parent = InputBg
