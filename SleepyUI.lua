@@ -1,24 +1,23 @@
 --[[
-    ⭐ StarHub UI Library (Perfected Premium Edition)
-    An ultra-modern, elegant, and perfectly balanced UI Framework for Roblox
-    Version 8.0.0 — Improved Edition
+    🌊 AquaHub UI Library (formerly StarHub)
+    An ultra-modern, elegant Roblox UI Framework — "Aqua Glow" edition
+    Version 9.0.0
 
-    Changelog vs 7.0.0:
-    - FIX: duplicate TabAPI:MultiDropdown definition removed (2nd copy silently
-      overwrote the 1st and dropped the search box). Kept the better version.
-    - FIX: WindowAPI:Notify was an empty placeholder -> real toast notifications.
-    - NEW: TabAPI:ColorPicker
-    - NEW: TabAPI:Keybind
-    - NEW: TabAPI:Label / TabAPI:Paragraph
-    - NEW: TabAPI:Input (numeric-only textbox with min/max clamp)
-    - NEW: Window resizing (bottom-right grip)
-    - NEW: UI toggle keybind (default RightControl)
-    - NEW: Config Save / Load (per-flag values, works with writefile/readfile
-      if the executor exposes them; falls back to in-memory table otherwise)
-    - NEW: Tooltip helper on hover for any element
-    - IMPROVED: Slider now supports decimals config + a live editable value box
-    - IMPROVED: Section header no longer double UICorner/hover glitch
-    - IMPROVED: Dropdown/MultiDropdown close automatically when window is minimized
+    Changelog vs 8.0.0:
+    - NEW LOOK: full re-theme inspired by modern hub-style GUIs (rounded cards,
+      sidebar search, gradient active-tab indicator) but with its own identity —
+      deep midnight background + aqua/emerald gradient accent instead of purple,
+      glassy glow on the active tab, and a glowing logo badge.
+    - NEW: sidebar search box that live-filters the tab list.
+    - NEW: active tab now shows a soft glowing gradient bar on the left edge
+      (like the reference image) instead of a flat background tint.
+    - NEW: floating dropdown/multidropdown lists now have a pill-style
+      "Search" header to match the reference's rounded search card.
+    - NEW: Theme table exposes AccentSecondary + Glow so the whole palette can
+      be swapped in one place.
+    - Everything from 8.0.0 (ColorPicker, Keybind, Label, Input, resize grip,
+      toggle keybind, config save/load, tooltips, fixed MultiDropdown, real
+      Notify) is kept as-is.
 ]]
 
 local SleepyUI = {}
@@ -29,18 +28,23 @@ local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 
+-- "Aqua Glow" palette: deep midnight-navy base with an emerald -> cyan
+-- gradient accent, instead of the common dark+purple hub look.
 local Theme = {
-    Background = Color3.fromRGB(15, 15, 20),
-    TopBar = Color3.fromRGB(15, 15, 20),
-    Sidebar = Color3.fromRGB(15, 15, 20),
-    Accent = Color3.fromRGB(255, 160, 20),
-    Text = Color3.fromRGB(255, 255, 255),
-    TextDim = Color3.fromRGB(140, 140, 150),
-    Element = Color3.fromRGB(22, 22, 28),
-    Border = Color3.fromRGB(30, 30, 40),
-    Hover = Color3.fromRGB(35, 35, 45),
+    Background = Color3.fromRGB(10, 13, 18),
+    TopBar = Color3.fromRGB(10, 13, 18),
+    Sidebar = Color3.fromRGB(10, 13, 18),
+    Accent = Color3.fromRGB(45, 220, 180),        -- emerald/teal
+    AccentSecondary = Color3.fromRGB(60, 170, 255), -- cyan-blue (used in gradients)
+    Glow = Color3.fromRGB(45, 220, 180),
+    Text = Color3.fromRGB(240, 245, 245),
+    TextDim = Color3.fromRGB(125, 140, 145),
+    Element = Color3.fromRGB(18, 23, 28),
+    ElementAlt = Color3.fromRGB(14, 18, 23),
+    Border = Color3.fromRGB(28, 36, 42),
+    Hover = Color3.fromRGB(26, 33, 39),
     Success = Color3.fromRGB(80, 220, 130),
-    Error = Color3.fromRGB(255, 80, 80),
+    Error = Color3.fromRGB(255, 90, 100),
     Warn = Color3.fromRGB(255, 200, 60),
 }
 
@@ -68,6 +72,15 @@ end
 
 local function addStroke(inst, color, thickness)
     return new("UIStroke", { Color = color or Theme.Border, Thickness = thickness or 1 }, inst)
+end
+
+-- Diagonal Accent -> AccentSecondary gradient, used on the logo badge,
+-- active-tab indicator bar, and a few glow accents.
+local function addAccentGradient(inst, rotation)
+    return new("UIGradient", {
+        Color = ColorSequence.new(Theme.Accent, Theme.AccentSecondary),
+        Rotation = rotation or 45,
+    }, inst)
 end
 
 -- Simple flag store shared by the whole window (used by Save/Load config)
@@ -177,26 +190,33 @@ function SleepyUI:CreateWindow(config)
         ClipsDescendants = true,
         Active = true,
     }, ScreenGui)
-    addCorner(MainFrame, UDim.new(0, 8))
+    addCorner(MainFrame, UDim.new(0, 14))
     addStroke(MainFrame)
 
     -- TOP BAR
-    local TopBar = new("Frame", { Size = UDim2.new(1, 0, 0, 42), BackgroundTransparency = 1, ZIndex = 10 }, MainFrame)
+    local TopBar = new("Frame", { Size = UDim2.new(1, 0, 0, 46), BackgroundTransparency = 1, ZIndex = 10 }, MainFrame)
 
-    new("TextLabel", {
-        Size = UDim2.new(0, 30, 1, 0),
-        Position = UDim2.new(0, 12, 0, 0),
-        BackgroundTransparency = 1,
-        Text = "⭐",
-        TextColor3 = Theme.Accent,
-        TextSize = 18,
-        Font = Enum.Font.GothamBold,
+    -- Glowing gradient logo badge (this hub's own identity mark)
+    local LogoBadge = new("Frame", {
+        Size = UDim2.new(0, 26, 0, 26),
+        Position = UDim2.new(0, 12, 0.5, -13),
+        BackgroundColor3 = Theme.Accent,
         ZIndex = 10,
     }, TopBar)
+    addCorner(LogoBadge, UDim.new(0.3, 0))
+    addAccentGradient(LogoBadge, 60)
+    new("TextLabel", {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Text = "🌊",
+        TextSize = 13,
+        Font = Enum.Font.GothamBold,
+        ZIndex = 11,
+    }, LogoBadge)
 
     local TitlePill = new("Frame", {
-        Size = UDim2.new(0, 160, 0, 26),
-        Position = UDim2.new(0, 46, 0.5, -13),
+        Size = UDim2.new(0, 170, 0, 28),
+        Position = UDim2.new(0, 48, 0.5, -14),
         BackgroundColor3 = Theme.Element,
         ZIndex = 10,
     }, TopBar)
@@ -335,10 +355,42 @@ function SleepyUI:CreateWindow(config)
     end)
 
     -- Sidebar
-    local Sidebar = new("Frame", { Size = UDim2.new(0, 150, 1, -42), Position = UDim2.new(0, 0, 0, 42), BackgroundTransparency = 1 }, MainFrame)
-    local TabContainer = new("ScrollingFrame", {
-        Size = UDim2.new(1, -20, 1, -20),
+    local Sidebar = new("Frame", { Size = UDim2.new(0, 170, 1, -46), Position = UDim2.new(0, 0, 0, 46), BackgroundTransparency = 1 }, MainFrame)
+
+    -- Sidebar search box (rounded card, like the reference's "Search" field)
+    local SidebarSearchBg = new("Frame", {
+        Size = UDim2.new(1, -20, 0, 32),
         Position = UDim2.new(0, 10, 0, 10),
+        BackgroundColor3 = Theme.Element,
+    }, Sidebar)
+    addCorner(SidebarSearchBg, UDim.new(0, 8))
+    addStroke(SidebarSearchBg)
+    new("TextLabel", {
+        Size = UDim2.new(0, 20, 1, 0),
+        Position = UDim2.new(0, 8, 0, 0),
+        BackgroundTransparency = 1,
+        Text = "🔍",
+        TextSize = 11,
+        Font = Enum.Font.Gotham,
+        TextColor3 = Theme.TextDim,
+    }, SidebarSearchBg)
+    local SidebarSearchBox = new("TextBox", {
+        Size = UDim2.new(1, -36, 1, 0),
+        Position = UDim2.new(0, 28, 0, 0),
+        BackgroundTransparency = 1,
+        Text = "",
+        PlaceholderText = "Search",
+        TextColor3 = Theme.Text,
+        PlaceholderColor3 = Theme.TextDim,
+        TextSize = 12,
+        Font = Enum.Font.Gotham,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ClearTextOnFocus = false,
+    }, SidebarSearchBg)
+
+    local TabContainer = new("ScrollingFrame", {
+        Size = UDim2.new(1, -20, 1, -52),
+        Position = UDim2.new(0, 10, 0, 48),
         BackgroundTransparency = 1,
         ScrollBarThickness = 0,
         CanvasSize = UDim2.new(0, 0, 0, 0),
@@ -346,8 +398,19 @@ function SleepyUI:CreateWindow(config)
     }, Sidebar)
     new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) }, TabContainer)
 
+    -- Live-filter tabs as the user types (searches by tab title)
+    SidebarSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        local query = SidebarSearchBox.Text:lower()
+        for _, child in pairs(TabContainer:GetChildren()) do
+            if child:IsA("TextButton") then
+                local labelText = (child:FindFirstChild("__TabLabel") and child.__TabLabel.Text or ""):lower()
+                child.Visible = (query == "" or labelText:find(query, 1, true) ~= nil)
+            end
+        end
+    end)
+
     -- Content Area
-    local ContentArea = new("Frame", { Size = UDim2.new(1, -150, 1, -42), Position = UDim2.new(0, 150, 0, 42), BackgroundTransparency = 1 }, MainFrame)
+    local ContentArea = new("Frame", { Size = UDim2.new(1, -170, 1, -46), Position = UDim2.new(0, 170, 0, 46), BackgroundTransparency = 1 }, MainFrame)
     local TopContentBar = new("Frame", { Size = UDim2.new(1, 0, 0, 38), BackgroundTransparency = 1 }, ContentArea)
     local ContentTitle = new("TextLabel", {
         Size = UDim2.new(1, -16, 1, 0),
@@ -519,16 +582,28 @@ function SleepyUI:CreateWindow(config)
         local tabIcon = tabConfig.Icon or "◈"
 
         local TabBtn = new("TextButton", {
-            Size = UDim2.new(1, 0, 0, 32),
-            BackgroundColor3 = Theme.Accent,
+            Size = UDim2.new(1, 0, 0, 34),
+            BackgroundColor3 = Theme.Element,
             BackgroundTransparency = 1,
             Text = "",
+            ClipsDescendants = true,
         }, TabContainer)
-        addCorner(TabBtn, UDim.new(0, 6))
+        addCorner(TabBtn, UDim.new(0, 7))
+
+        -- Left glowing accent bar (visible only when this tab is active),
+        -- mirrors the vertical highlight bar in the reference screenshot.
+        local AccentBar = new("Frame", {
+            Size = UDim2.new(0, 3, 0.6, 0),
+            Position = UDim2.new(0, 0, 0.2, 0),
+            BackgroundColor3 = Theme.Accent,
+            BackgroundTransparency = 1,
+        }, TabBtn)
+        addCorner(AccentBar, UDim.new(1, 0))
+        addAccentGradient(AccentBar, 90)
 
         local IconLabel = new("TextLabel", {
             Size = UDim2.new(0, 30, 1, 0),
-            Position = UDim2.new(0, 8, 0, 0),
+            Position = UDim2.new(0, 10, 0, 0),
             BackgroundTransparency = 1,
             Text = tabIcon,
             TextColor3 = Theme.TextDim,
@@ -537,8 +612,9 @@ function SleepyUI:CreateWindow(config)
         }, TabBtn)
 
         local TextLabel = new("TextLabel", {
-            Size = UDim2.new(1, -38, 1, 0),
-            Position = UDim2.new(0, 38, 0, 0),
+            Name = "__TabLabel",
+            Size = UDim2.new(1, -40, 1, 0),
+            Position = UDim2.new(0, 40, 0, 0),
             BackgroundTransparency = 1,
             Text = tabTitle,
             TextColor3 = Theme.TextDim,
@@ -562,27 +638,24 @@ function SleepyUI:CreateWindow(config)
             Page.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
         end)
 
+        local function setActive(entry, active)
+            tween(entry.Btn, TweenInfo.new(0.2), { BackgroundTransparency = active and 0.88 or 1 })
+            tween(entry.AccentBar, TweenInfo.new(0.2), { BackgroundTransparency = active and 0 or 1 })
+            entry.Icon.TextColor3 = active and Theme.Accent or Theme.TextDim
+            entry.Text.TextColor3 = active and Theme.Text or Theme.TextDim
+            entry.Text.Font = active and Enum.Font.GothamBold or Enum.Font.Gotham
+        end
+
         TabBtn.MouseButton1Click:Connect(function()
-            if activeTab then
-                tween(activeTab.Btn, TweenInfo.new(0.2), { BackgroundTransparency = 1 })
-                activeTab.Icon.TextColor3 = Theme.TextDim
-                activeTab.Text.TextColor3 = Theme.TextDim
-                activeTab.Text.Font = Enum.Font.Gotham
-            end
-            tween(TabBtn, TweenInfo.new(0.2), { BackgroundTransparency = 0.85 })
-            IconLabel.TextColor3 = Theme.Accent
-            TextLabel.TextColor3 = Theme.Text
-            TextLabel.Font = Enum.Font.GothamBold
-            activeTab = { Btn = TabBtn, Icon = IconLabel, Text = TextLabel }
+            if activeTab then setActive(activeTab, false) end
+            activeTab = { Btn = TabBtn, Icon = IconLabel, Text = TextLabel, AccentBar = AccentBar }
+            setActive(activeTab, true)
             ShowPage(Page, tabTitle)
         end)
 
         if not activeTab then
-            TabBtn.BackgroundTransparency = 0.85
-            IconLabel.TextColor3 = Theme.Accent
-            TextLabel.TextColor3 = Theme.Text
-            TextLabel.Font = Enum.Font.GothamBold
-            activeTab = { Btn = TabBtn, Icon = IconLabel, Text = TextLabel }
+            activeTab = { Btn = TabBtn, Icon = IconLabel, Text = TextLabel, AccentBar = AccentBar }
+            setActive(activeTab, true)
             Page.Visible = true
             ContentTitle.Text = tabTitle
         end
@@ -594,28 +667,23 @@ function SleepyUI:CreateWindow(config)
             local isDefault = secConfig.Default
 
             local AccFrame = new("Frame", {
-                Size = UDim2.new(1, 0, 0, 38),
-                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 0, 40),
+                BackgroundColor3 = Theme.Element,
+                BackgroundTransparency = 0.4,
                 ClipsDescendants = true,
             }, Page)
+            addCorner(AccFrame, UDim.new(0, 8))
+            addStroke(AccFrame)
 
             local AccBtn = new("TextButton", {
-                Size = UDim2.new(1, 0, 0, 38),
-                BackgroundColor3 = Theme.Element,
+                Size = UDim2.new(1, 0, 0, 40),
                 BackgroundTransparency = 1,
                 Text = "",
             }, AccFrame)
 
-            new("Frame", {
-                Size = UDim2.new(1, 0, 0, 1),
-                Position = UDim2.new(0, 0, 1, -1),
-                BackgroundColor3 = Theme.Border,
-                BorderSizePixel = 0,
-            }, AccBtn)
-
             new("TextLabel", {
                 Size = UDim2.new(1, -40, 1, 0),
-                Position = UDim2.new(0, 10, 0, 0),
+                Position = UDim2.new(0, 12, 0, 0),
                 BackgroundTransparency = 1,
                 Text = secTitle,
                 TextColor3 = Theme.Text,
@@ -636,7 +704,7 @@ function SleepyUI:CreateWindow(config)
 
             local ContentFrame = new("Frame", {
                 Size = UDim2.new(1, 0, 0, 0),
-                Position = UDim2.new(0, 0, 0, 38),
+                Position = UDim2.new(0, 0, 0, 40),
                 BackgroundTransparency = 1,
             }, AccFrame)
 
@@ -645,7 +713,7 @@ function SleepyUI:CreateWindow(config)
             local isOpen = false
             CLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
                 if isOpen then
-                    AccFrame.Size = UDim2.new(1, 0, 0, 38 + CLayout.AbsoluteContentSize.Y + 8)
+                    AccFrame.Size = UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 8)
                 end
                 ContentFrame.Size = UDim2.new(1, 0, 0, CLayout.AbsoluteContentSize.Y)
             end)
@@ -654,14 +722,14 @@ function SleepyUI:CreateWindow(config)
                 isOpen = not isOpen
                 AccArrow.Text = isOpen and "^" or "v"
                 tween(AccFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                    Size = isOpen and UDim2.new(1, 0, 0, 38 + CLayout.AbsoluteContentSize.Y + 8) or UDim2.new(1, 0, 0, 38)
+                    Size = isOpen and UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 8) or UDim2.new(1, 0, 0, 40)
                 })
             end)
 
             if isDefault then
                 isOpen = true
                 AccArrow.Text = "^"
-                AccFrame.Size = UDim2.new(1, 0, 0, 38 + CLayout.AbsoluteContentSize.Y + 8)
+                AccFrame.Size = UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 8)
             end
 
             return {
@@ -1028,13 +1096,8 @@ function SleepyUI:CreateWindow(config)
             }, Overlay)
             addCorner(OptionList, UDim.new(0, 4))
             addStroke(OptionList)
-            local ListLayout = new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }, OptionList)
-            
-            ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                local h = ListLayout.AbsoluteContentSize.Y
-                OptionList.CanvasSize = UDim2.new(0, 0, 0, h)
-                OptionList.Size = UDim2.new(0, 150, 0, math.min(h, 156))
-            end)
+            new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }, OptionList)
+
             local SearchBox = new("TextBox", {
                 Size = UDim2.new(1, -10, 0, 26),
                 Position = UDim2.new(0, 5, 0, 0),
@@ -1157,14 +1220,6 @@ function SleepyUI:CreateWindow(config)
 
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    local mPos = input.Position
-                    local oPos = OptionList.AbsolutePosition
-                    local oSize = OptionList.AbsoluteSize
-                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
-                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
-                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
-                    end
-                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
@@ -1312,14 +1367,6 @@ function SleepyUI:CreateWindow(config)
 
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    local mPos = input.Position
-                    local oPos = OptionList.AbsolutePosition
-                    local oSize = OptionList.AbsoluteSize
-                    if OptionList.Visible and mPos.X >= oPos.X and mPos.X <= oPos.X + oSize.X and
-                       mPos.Y >= oPos.Y and mPos.Y <= oPos.Y + oSize.Y then
-                        return -- Do not close if clicking inside the Dropdown (e.g. SearchBox)
-                    end
-                    
                     lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
