@@ -1047,24 +1047,22 @@ function PulseUI:CreateWindow(config)
         --------------------------------------------------------
         -- Shared floating list builder for Dropdown / MultiDropdown
         --------------------------------------------------------
-        local function floatingList(width)
+        local function floatingList()
             local OptionList = new("ScrollingFrame", {
-                BackgroundColor3 = Theme.Hover, BorderSizePixel = 0, ScrollBarThickness = 2,
+                BackgroundColor3 = Theme.Element, BorderSizePixel = 0, ScrollBarThickness = 2,
                 ScrollBarImageColor3 = Theme.AccentA, Visible = false, ZIndex = 101,
             }, Overlay)
-            corner(OptionList, UDim.new(0, 6))
+            corner(OptionList, UDim.new(0, 4))
             stroke(OptionList)
-            new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }, OptionList)
-            new("UIPadding", { PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4) }, OptionList)
+            new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }, OptionList)
 
             local SearchBox2 = new("TextBox", {
-                Size = UDim2.new(1, -12, 0, 26), Position = UDim2.new(0, 6, 0, 0), BackgroundColor3 = Theme.Element,
-                BackgroundTransparency = 0, Text = "", PlaceholderText = "  🔍 Search...", TextColor3 = Theme.Text,
+                Size = UDim2.new(1, -10, 0, 26), Position = UDim2.new(0, 5, 0, 0), BackgroundColor3 = Theme.Background,
+                BackgroundTransparency = 0.5, Text = "", PlaceholderText = "  🔍 Search...", TextColor3 = Theme.Text,
                 PlaceholderColor3 = Theme.TextDim, TextSize = 11, Font = Enum.Font.Gotham,
-                TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = -1, ZIndex = 102,
+                TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = -1,
             }, OptionList)
             corner(SearchBox2, UDim.new(0, 4))
-            stroke(SearchBox2)
 
             SearchBox2:GetPropertyChangedSignal("Text"):Connect(function()
                 local q = SearchBox2.Text:lower()
@@ -1088,38 +1086,36 @@ function PulseUI:CreateWindow(config)
             local isOpen = false
 
             local DropBtn = new("TextButton", {
-                Size = UDim2.new(0, 180, 0, 28), Position = UDim2.new(1, -190, 0.5, -14), BackgroundColor3 = Theme.ElementAlt,
-                Text = "  " .. selected, TextColor3 = Theme.Text, TextSize = 11, Font = Enum.Font.GothamMedium,
-                TextXAlignment = Enum.TextXAlignment.Left,
+                Size = UDim2.new(0, 150, 0, 26), Position = UDim2.new(1, -160, 0.5, -13), BackgroundColor3 = Theme.Element,
+                Text = selected, TextColor3 = Theme.TextDim, TextSize = 11, Font = Enum.Font.Gotham,
             }, EFrame)
-            corner(DropBtn, UDim.new(0, 6))
+            corner(DropBtn, UDim.new(0, 4))
             stroke(DropBtn)
             local DropIcon = new("TextLabel", {
                 Size = UDim2.new(0, 24, 1, 0), Position = UDim2.new(1, -24, 0, 0), BackgroundTransparency = 1,
                 Text = "v", TextColor3 = Theme.TextDim, TextSize = 11, Font = Enum.Font.GothamBold,
             }, DropBtn)
 
-            local OptionList, SearchBox2 = floatingList(180)
+            local OptionList, SearchBox2 = floatingList()
 
             local function refreshOptions(newValues)
                 for _, child in pairs(OptionList:GetChildren()) do
                     if child:IsA("TextButton") and child ~= SearchBox2 then child:Destroy() end
                 end
                 cfg.Values = newValues or cfg.Values or {}
-                local totalHeight = 34 -- Initial padding + searchbox
+                local totalHeight = 26
                 for _, val in ipairs(cfg.Values) do
                     local OptBtn = new("TextButton", {
-                        Size = UDim2.new(1, -12, 0, 28), Position = UDim2.new(0, 6, 0, 0), BackgroundColor3 = Theme.Element, BackgroundTransparency = 1,
+                        Size = UDim2.new(1, 0, 0, 26), BackgroundColor3 = Theme.Hover, BackgroundTransparency = 1,
                         Text = "  " .. val, TextColor3 = val == selected and Theme.AccentA or Theme.TextDim,
                         TextSize = 11, Font = Enum.Font.Gotham, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 102,
                     }, OptionList)
-                    corner(OptBtn, UDim.new(0, 4))
-                    totalHeight = totalHeight + 30
+                    totalHeight = totalHeight + 26
                     OptBtn.MouseEnter:Connect(function() tw(OptBtn, TweenInfo.new(0.2), { BackgroundTransparency = 0 }) end)
                     OptBtn.MouseLeave:Connect(function() tw(OptBtn, TweenInfo.new(0.2), { BackgroundTransparency = 1 }) end)
                     OptBtn.MouseButton1Click:Connect(function()
                         selected = val
-                        DropBtn.Text = "  " .. selected
+                        DropBtn.Text = selected
                         isOpen = false
                         DropIcon.Text = "v"
                         Overlay.Visible = false
@@ -1131,8 +1127,8 @@ function PulseUI:CreateWindow(config)
                         if cfg.Callback then pcall(cfg.Callback, selected) end
                     end)
                 end
-                OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight + 4)
-                OptionList.Size = UDim2.new(0, 180, 0, math.min(totalHeight + 4, 180))
+                OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 156))
             end
 
             local lastToggle = 0
@@ -1147,7 +1143,7 @@ function PulseUI:CreateWindow(config)
                     Overlay.Visible = true
                     OptionList.Visible = true
                     local absPos = DropBtn.AbsolutePosition
-                    OptionList.Position = UDim2.new(0, absPos.X, 0, absPos.Y + 32)
+                    OptionList.Position = UDim2.new(0, absPos.X, 0, absPos.Y + 30)
                 else
                     Overlay.Visible = false
                     OptionList.Visible = false
@@ -1212,46 +1208,37 @@ function PulseUI:CreateWindow(config)
 
             local function selectedText()
                 if #selected == 0 then return "Select Options" end
-                if #selected == 1 then return selected[1] end
-                return #selected .. " Options Selected"
+                return table.concat(selected, ", ")
             end
 
             local DropBtn = new("TextButton", {
-                Size = UDim2.new(0, 180, 0, 28), Position = UDim2.new(1, -190, 0.5, -14), BackgroundColor3 = Theme.ElementAlt,
-                Text = "  " .. selectedText(), TextColor3 = Theme.Text, TextSize = 11, Font = Enum.Font.GothamMedium,
-                ClipsDescendants = true, TextXAlignment = Enum.TextXAlignment.Left,
+                Size = UDim2.new(0, 150, 0, 26), Position = UDim2.new(1, -160, 0.5, -13), BackgroundColor3 = Theme.Element,
+                Text = selectedText(), TextColor3 = Theme.TextDim, TextSize = 11, Font = Enum.Font.Gotham,
+                TextTruncate = Enum.TextTruncate.AtEnd,
             }, EFrame)
-            corner(DropBtn, UDim.new(0, 6))
+            corner(DropBtn, UDim.new(0, 4))
             stroke(DropBtn)
             local DropIcon = new("TextLabel", {
                 Size = UDim2.new(0, 24, 1, 0), Position = UDim2.new(1, -24, 0, 0), BackgroundTransparency = 1,
                 Text = "v", TextColor3 = Theme.TextDim, TextSize = 11, Font = Enum.Font.GothamBold,
             }, DropBtn)
 
-            local OptionList, SearchBox2 = floatingList(180)
+            local OptionList, SearchBox2 = floatingList()
 
             local function refreshOptions(newValues)
                 for _, child in pairs(OptionList:GetChildren()) do
                     if child:IsA("TextButton") and child ~= SearchBox2 then child:Destroy() end
                 end
                 cfg.Values = newValues or cfg.Values or {}
-                local totalHeight = 34
+                local totalHeight = 26
                 for _, val in ipairs(cfg.Values) do
                     local isSel = table.find(selected, val) ~= nil
                     local OptBtn = new("TextButton", {
-                        Size = UDim2.new(1, -12, 0, 28), Position = UDim2.new(0, 6, 0, 0), BackgroundColor3 = Theme.Element, BackgroundTransparency = 1,
-                        Text = val, TextColor3 = isSel and Theme.AccentA or Theme.TextDim, TextSize = 11,
+                        Size = UDim2.new(1, 0, 0, 26), BackgroundColor3 = Theme.Hover, BackgroundTransparency = 1,
+                        Text = "  " .. val, TextColor3 = isSel and Theme.AccentA or Theme.TextDim, TextSize = 11,
                         Font = Enum.Font.Gotham, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 102,
                     }, OptionList)
-                    corner(OptBtn, UDim.new(0, 4))
-                    padding(OptBtn, 28, 0, 0, 0)
-                    local CheckBox = new("Frame", {
-                        Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(0, -22, 0.5, -7),
-                        BackgroundColor3 = isSel and Theme.AccentA or Theme.Element, ZIndex = 102,
-                    }, OptBtn)
-                    corner(CheckBox, UDim.new(0, 3))
-                    stroke(CheckBox)
-                    totalHeight = totalHeight + 30
+                    totalHeight = totalHeight + 26
                     OptBtn.MouseEnter:Connect(function() tw(OptBtn, TweenInfo.new(0.2), { BackgroundTransparency = 0 }) end)
                     OptBtn.MouseLeave:Connect(function() tw(OptBtn, TweenInfo.new(0.2), { BackgroundTransparency = 1 }) end)
                     OptBtn.MouseButton1Click:Connect(function()
@@ -1259,19 +1246,17 @@ function PulseUI:CreateWindow(config)
                         if idx then
                             table.remove(selected, idx)
                             OptBtn.TextColor3 = Theme.TextDim
-                            tw(CheckBox, TweenInfo.new(0.2), { BackgroundColor3 = Theme.Element })
                         else
                             table.insert(selected, val)
                             OptBtn.TextColor3 = Theme.AccentA
-                            tw(CheckBox, TweenInfo.new(0.2), { BackgroundColor3 = Theme.AccentA })
                         end
-                        DropBtn.Text = "  " .. selectedText()
+                        DropBtn.Text = selectedText()
                         if cfg.Flag then FlagStore[cfg.Flag] = selected end
                         if cfg.Callback then pcall(cfg.Callback, selected) end
                     end)
                 end
-                OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight + 4)
-                OptionList.Size = UDim2.new(0, 180, 0, math.min(totalHeight + 4, 180))
+                OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 156))
             end
 
             local lastToggle = 0
@@ -1286,7 +1271,7 @@ function PulseUI:CreateWindow(config)
                     Overlay.Visible = true
                     OptionList.Visible = true
                     local absPos = DropBtn.AbsolutePosition
-                    OptionList.Position = UDim2.new(0, absPos.X, 0, absPos.Y + 32)
+                    OptionList.Position = UDim2.new(0, absPos.X, 0, absPos.Y + 30)
                 else
                     Overlay.Visible = false
                     OptionList.Visible = false
