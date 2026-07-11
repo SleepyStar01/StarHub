@@ -87,6 +87,7 @@ function SleepyUI:CreateWindow(config)
     MainFrame.BackgroundTransparency = 0.02
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
+    MainFrame.Active = true
     MainFrame.Parent = ScreenGui
 
     local UICorner = Instance.new("UICorner")
@@ -1035,6 +1036,58 @@ function SleepyUI:CreateWindow(config)
                     DropBtn.Text = selected
                     RefreshOptions(newValues)
                     if config.Callback then pcall(config.Callback, selected) end
+                end
+            }
+        end
+
+        function TabAPI:TextBox(config)
+            local EFrame = CreateElementFrame(config)
+            local val = config.Default or ""
+            local placeholder = config.Placeholder or ""
+            
+            local InputBg = Instance.new("Frame")
+            InputBg.Size = UDim2.new(0, 150, 0, 26)
+            InputBg.Position = UDim2.new(1, -160, 0.5, -13)
+            InputBg.BackgroundColor3 = Theme.Element
+            InputBg.Parent = EFrame
+            local BgCorner = Instance.new("UICorner")
+            BgCorner.CornerRadius = UDim.new(0, 4)
+            BgCorner.Parent = InputBg
+            local UIStroke = Instance.new("UIStroke")
+            UIStroke.Color = Theme.Border
+            UIStroke.Thickness = 1
+            UIStroke.Parent = InputBg
+            
+            local TextBox = Instance.new("TextBox")
+            TextBox.Size = UDim2.new(1, -16, 1, 0)
+            TextBox.Position = UDim2.new(0, 8, 0, 0)
+            TextBox.BackgroundTransparency = 1
+            TextBox.Text = tostring(val)
+            TextBox.PlaceholderText = placeholder
+            TextBox.TextColor3 = Theme.TextDim
+            TextBox.TextSize = 11
+            TextBox.Font = Enum.Font.Gotham
+            TextBox.TextXAlignment = Enum.TextXAlignment.Left
+            TextBox.ClearTextOnFocus = false
+            TextBox.Parent = InputBg
+            
+            TextBox.Focused:Connect(function()
+                TweenService:Create(UIStroke, TweenInfo.new(0.2), {Color = Theme.Accent}):Play()
+                TextBox.TextColor3 = Theme.Text
+            end)
+            
+            TextBox.FocusLost:Connect(function()
+                TweenService:Create(UIStroke, TweenInfo.new(0.2), {Color = Theme.Border}):Play()
+                TextBox.TextColor3 = Theme.TextDim
+                if config.Callback then pcall(config.Callback, TextBox.Text) end
+            end)
+            
+            return {
+                SetText = function(txt)
+                    TextBox.Text = tostring(txt)
+                end,
+                GetText = function()
+                    return TextBox.Text
                 end
             }
         end
