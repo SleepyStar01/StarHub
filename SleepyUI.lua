@@ -638,14 +638,46 @@ function SleepyUI:CreateWindow(config)
             ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
             ListLayout.Parent = OptionList
             
+            local SearchBox = Instance.new("TextBox")
+            SearchBox.Size = UDim2.new(1, -10, 0, 26)
+            SearchBox.Position = UDim2.new(0, 5, 0, 0)
+            SearchBox.BackgroundColor3 = Theme.Background
+            SearchBox.BackgroundTransparency = 0.5
+            SearchBox.Text = ""
+            SearchBox.PlaceholderText = "  🔍 Search..."
+            SearchBox.TextColor3 = Theme.Text
+            SearchBox.PlaceholderColor3 = Theme.TextDim
+            SearchBox.TextSize = 11
+            SearchBox.Font = Enum.Font.Gotham
+            SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+            SearchBox.LayoutOrder = -1
+            SearchBox.Parent = OptionList
+            
+            local SBCorner = Instance.new("UICorner")
+            SBCorner.CornerRadius = UDim.new(0, 4)
+            SBCorner.Parent = SearchBox
+            
+            SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                local query = SearchBox.Text:lower()
+                for _, child in pairs(OptionList:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        if query == "" or child.Text:lower():find(query) then
+                            child.Visible = true
+                        else
+                            child.Visible = false
+                        end
+                    end
+                end
+            end)
+            
             local function RefreshOptions(newValues)
                 for _, child in pairs(OptionList:GetChildren()) do
-                    if not child:IsA("UIListLayout") then child:Destroy() end
+                    if child:IsA("TextButton") then child:Destroy() end
                 end
                 
                 config.Values = newValues or config.Values or {}
                 
-                local totalHeight = 0
+                local totalHeight = 26 -- For SearchBox
                 for _, val in ipairs(config.Values) do
                     local isSel = table.find(selected, val) ~= nil
                     
@@ -700,12 +732,17 @@ function SleepyUI:CreateWindow(config)
                 OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 156))
             end
             
+            local lastToggle = 0
             DropBtn.MouseButton1Click:Connect(function()
+                if tick() - lastToggle < 0.1 then return end
+                lastToggle = tick()
+                
                 if not config.Values or #config.Values == 0 then return end
                 isOpen = not isOpen
                 DropIcon.Text = isOpen and "^" or "v"
                 
                 if isOpen then
+                    SearchBox.Text = ""
                     Overlay.Visible = true
                     OptionList.Visible = true
                     local absPos = DropBtn.AbsolutePosition
@@ -718,6 +755,7 @@ function SleepyUI:CreateWindow(config)
             
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
                     Overlay.Visible = false
@@ -957,15 +995,47 @@ function SleepyUI:CreateWindow(config)
             ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
             ListLayout.Parent = OptionList
             
+            local SearchBox = Instance.new("TextBox")
+            SearchBox.Size = UDim2.new(1, -10, 0, 26)
+            SearchBox.Position = UDim2.new(0, 5, 0, 0)
+            SearchBox.BackgroundColor3 = Theme.Background
+            SearchBox.BackgroundTransparency = 0.5
+            SearchBox.Text = ""
+            SearchBox.PlaceholderText = "  🔍 Search..."
+            SearchBox.TextColor3 = Theme.Text
+            SearchBox.PlaceholderColor3 = Theme.TextDim
+            SearchBox.TextSize = 11
+            SearchBox.Font = Enum.Font.Gotham
+            SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+            SearchBox.LayoutOrder = -1
+            SearchBox.Parent = OptionList
+            
+            local SBCorner = Instance.new("UICorner")
+            SBCorner.CornerRadius = UDim.new(0, 4)
+            SBCorner.Parent = SearchBox
+            
+            SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                local query = SearchBox.Text:lower()
+                for _, child in pairs(OptionList:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        if query == "" or child.Text:lower():find(query) then
+                            child.Visible = true
+                        else
+                            child.Visible = false
+                        end
+                    end
+                end
+            end)
+            
             local function RefreshOptions(newValues)
                 for _, child in pairs(OptionList:GetChildren()) do
-                    if not child:IsA("UIListLayout") then child:Destroy() end
+                    if child:IsA("TextButton") then child:Destroy() end
                 end
                 
                 config.Values = newValues or config.Values
                 if not config.Values then config.Values = {} end
                 
-                local totalHeight = 0
+                local totalHeight = 26 -- For SearchBox
                 for _, val in ipairs(config.Values) do
                     local OptBtn = Instance.new("TextButton")
                     OptBtn.Size = UDim2.new(1, 0, 0, 26)
@@ -1003,12 +1073,17 @@ function SleepyUI:CreateWindow(config)
                 OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 156))
             end
             
+            local lastToggle = 0
             DropBtn.MouseButton1Click:Connect(function()
+                if tick() - lastToggle < 0.1 then return end
+                lastToggle = tick()
+                
                 if not config.Values or #config.Values == 0 then return end
                 isOpen = not isOpen
                 DropIcon.Text = isOpen and "^" or "v"
                 
                 if isOpen then
+                    SearchBox.Text = ""
                     Overlay.Visible = true
                     OptionList.Visible = true
                     local absPos = DropBtn.AbsolutePosition
@@ -1021,6 +1096,7 @@ function SleepyUI:CreateWindow(config)
             
             Overlay.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    lastToggle = tick()
                     isOpen = false
                     DropIcon.Text = "v"
                     Overlay.Visible = false
@@ -1036,6 +1112,19 @@ function SleepyUI:CreateWindow(config)
                     DropBtn.Text = selected
                     RefreshOptions(newValues)
                     if config.Callback then pcall(config.Callback, selected) end
+                end,
+                SetValues = function(newValues)
+                    config.Values = newValues
+                    RefreshOptions(newValues)
+                end,
+                SetValue = function(val)
+                    selected = val
+                    DropBtn.Text = selected
+                    for _, ob in pairs(OptionList:GetChildren()) do
+                        if ob:IsA("TextButton") then
+                            ob.TextColor3 = ob.Text:sub(3) == selected and Theme.Accent or Theme.TextDim
+                        end
+                    end
                 end
             }
         end
