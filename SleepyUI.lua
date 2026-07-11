@@ -62,7 +62,7 @@ function SleepyUI:CreateWindow(config)
     MinStar.Text = "⭐"
     MinStar.TextColor3 = Color3.fromRGB(255, 255, 255)
     MinStar.TextSize = 22
-    MinStar.Font = Enum.Font.GothamMediumBold
+    MinStar.Font = Enum.Font.GothamBold
     MinStar.Parent = MinIcon
     
     local dragMin, dragMinInput, dragMinStart, startMinPos
@@ -113,7 +113,7 @@ function SleepyUI:CreateWindow(config)
     Logo.Text = "⭐"
     Logo.TextColor3 = Theme.Accent
     Logo.TextSize = 18
-    Logo.Font = Enum.Font.GothamMediumBold
+    Logo.Font = Enum.Font.GothamBold
     Logo.ZIndex = 10
     Logo.Parent = TopBar
     
@@ -137,7 +137,7 @@ function SleepyUI:CreateWindow(config)
     TitleLabel.Text = title
     TitleLabel.TextColor3 = Theme.Text
     TitleLabel.TextSize = 11
-    TitleLabel.Font = Enum.Font.GothamMediumBold
+    TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.ZIndex = 10
     TitleLabel.Parent = TitlePill
     
@@ -149,7 +149,7 @@ function SleepyUI:CreateWindow(config)
     CloseBtn.Text = "✕"
     CloseBtn.TextColor3 = Theme.TextDim
     CloseBtn.TextSize = 14
-    CloseBtn.Font = Enum.Font.GothamMediumBold
+    CloseBtn.Font = Enum.Font.GothamBold
     CloseBtn.ZIndex = 10
     CloseBtn.Parent = TopBar
     CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 80, 80)}):Play() end)
@@ -162,7 +162,7 @@ function SleepyUI:CreateWindow(config)
     MinBtn.Text = "—"
     MinBtn.TextColor3 = Theme.TextDim
     MinBtn.TextSize = 14
-    MinBtn.Font = Enum.Font.GothamMediumBold
+    MinBtn.Font = Enum.Font.GothamBold
     MinBtn.ZIndex = 10
     MinBtn.Parent = TopBar
     MinBtn.MouseEnter:Connect(function() TweenService:Create(MinBtn, TweenInfo.new(0.2), {TextColor3 = Theme.Text}):Play() end)
@@ -249,7 +249,7 @@ function SleepyUI:CreateWindow(config)
     ContentTitle.Text = "Home"
     ContentTitle.TextColor3 = Theme.Text
     ContentTitle.TextSize = 20
-    ContentTitle.Font = Enum.Font.GothamMediumBold
+    ContentTitle.Font = Enum.Font.GothamBold
     ContentTitle.TextXAlignment = Enum.TextXAlignment.Left
     ContentTitle.Parent = TopContentBar
 
@@ -333,7 +333,7 @@ function SleepyUI:CreateWindow(config)
             TweenService:Create(TabBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.85}):Play()
             IconLabel.TextColor3 = Theme.Accent
             TextLabel.TextColor3 = Theme.Text
-            TextLabel.Font = Enum.Font.GothamMediumBold
+            TextLabel.Font = Enum.Font.GothamBold
             activeTab = {Btn = TabBtn, Icon = IconLabel, Text = TextLabel}
             ShowPage(Page, tabTitle)
         end)
@@ -342,7 +342,7 @@ function SleepyUI:CreateWindow(config)
             TabBtn.BackgroundTransparency = 0.85
             IconLabel.TextColor3 = Theme.Accent
             TextLabel.TextColor3 = Theme.Text
-            TextLabel.Font = Enum.Font.GothamMediumBold
+            TextLabel.Font = Enum.Font.GothamBold
             activeTab = {Btn = TabBtn, Icon = IconLabel, Text = TextLabel}
             Page.Visible = true
             ContentTitle.Text = tabTitle
@@ -382,7 +382,7 @@ function SleepyUI:CreateWindow(config)
             AccTitle.Text = secTitle
             AccTitle.TextColor3 = Theme.Text
             AccTitle.TextSize = 13
-            AccTitle.Font = Enum.Font.GothamMediumBold
+            AccTitle.Font = Enum.Font.GothamBold
             AccTitle.TextXAlignment = Enum.TextXAlignment.Left
             AccTitle.Parent = AccBtn
 
@@ -393,7 +393,7 @@ function SleepyUI:CreateWindow(config)
             AccArrow.Text = "v"
             AccArrow.TextColor3 = Theme.TextDim
             AccArrow.TextSize = 12
-            AccArrow.Font = Enum.Font.GothamMediumBold
+            AccArrow.Font = Enum.Font.GothamBold
             AccArrow.Parent = AccBtn
 
             local ContentFrame = Instance.new("Frame")
@@ -456,7 +456,7 @@ function SleepyUI:CreateWindow(config)
             Label.Text = config.Title or "Element"
             Label.TextColor3 = Theme.Text
             Label.TextSize = 13
-            Label.Font = Enum.Font.GothamMediumBold
+            Label.Font = Enum.Font.GothamBold
             Label.TextXAlignment = Enum.TextXAlignment.Left
             Label.Parent = EFrame
             
@@ -613,7 +613,7 @@ function SleepyUI:CreateWindow(config)
             DropIcon.Text = "v"
             DropIcon.TextColor3 = Theme.TextDim
             DropIcon.TextSize = 11
-            DropIcon.Font = Enum.Font.GothamMediumBold
+            DropIcon.Font = Enum.Font.GothamBold
             DropIcon.Parent = DropBtn
 
             local OptionList = Instance.new("ScrollingFrame")
@@ -828,7 +828,7 @@ function SleepyUI:CreateWindow(config)
             DropIcon.Text = "v"
             DropIcon.TextColor3 = Theme.TextDim
             DropIcon.TextSize = 11
-            DropIcon.Font = Enum.Font.GothamMediumBold
+            DropIcon.Font = Enum.Font.GothamBold
             DropIcon.Parent = DropBtn
 
             local OptionList = Instance.new("ScrollingFrame")
@@ -982,7 +982,7 @@ function SleepyUI:CreateWindow(config)
             DropIcon.Text = "v"
             DropIcon.TextColor3 = Theme.TextDim
             DropIcon.TextSize = 11
-            DropIcon.Font = Enum.Font.GothamMediumBold
+            DropIcon.Font = Enum.Font.GothamBold
             DropIcon.Parent = DropBtn
 
             -- Floating List
