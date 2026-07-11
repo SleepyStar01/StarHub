@@ -1128,7 +1128,7 @@ function PulseUI:CreateWindow(config)
                     end)
                 end
                 OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-                OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 156))
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 130))
             end
 
             local lastToggle = 0
@@ -1256,7 +1256,7 @@ function PulseUI:CreateWindow(config)
                     end)
                 end
                 OptionList.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-                OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 156))
+                OptionList.Size = UDim2.new(0, 150, 0, math.min(totalHeight, 130))
             end
 
             local lastToggle = 0
