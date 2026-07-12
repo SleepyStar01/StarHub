@@ -768,7 +768,15 @@ function PulseUI:CreateWindow(config)
             cfg = cfg or {}
             local EFrame = elementFrame(cfg)
             local min, max = cfg.Min or 0, cfg.Max or 100
-            local decimals = cfg.Decimals or 0
+            local decimals = cfg.Decimals
+            if decimals == nil then
+                if max - min <= 10 then
+                    decimals = 2 -- Auto 2 decimals for small ranges
+                else
+                    decimals = 0
+                end
+            end
+            
             local val = cfg.Default or min
             if cfg.Flag and FlagStore[cfg.Flag] then val = FlagStore[cfg.Flag] end
 
@@ -794,7 +802,14 @@ function PulseUI:CreateWindow(config)
 
             local function setValue(newVal, fire)
                 newVal = math.clamp(newVal, min, max)
-                local p = (newVal - min) / (max - min)
+                if decimals <= 0 then
+                    newVal = math.floor(newVal)
+                else
+                    local m = 10 ^ decimals
+                    newVal = math.floor(newVal * m) / m
+                end
+                
+                local p = (max == min) and 0 or (newVal - min) / (max - min)
                 Fill.Size = UDim2.new(p, 0, 1, 0)
                 Thumb.Position = UDim2.new(p, -6, 0.5, -6)
                 val = newVal
