@@ -626,13 +626,24 @@ function PulseUI:CreateWindow(config)
 
         function Tab:Label(cfg)
             local text = type(cfg) == "string" and cfg or (cfg.Text or "Label")
-            local Holder = new("Frame", { Size = UDim2.new(1, 0, 0, 24), BackgroundTransparency = 1 }, Page)
+            local targetParent = type(cfg) == "table" and cfg.Section and cfg.Section.ContentFrame or Page
+            local Holder = new("Frame", { 
+                Size = UDim2.new(1, 0, 0, 0), 
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundTransparency = 1 
+            }, targetParent)
             local Lbl = new("TextLabel", {
-                Size = UDim2.new(1, -10, 1, 0), Position = UDim2.new(0, 10, 0, 0), BackgroundTransparency = 1,
+                Size = UDim2.new(1, -10, 0, 0), 
+                Position = UDim2.new(0, 10, 0, 0), 
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundTransparency = 1,
                 Text = text, TextColor3 = Theme.TextDim, TextSize = 12, Font = Enum.Font.Gotham,
                 TextXAlignment = Enum.TextXAlignment.Left, TextWrapped = true,
             }, Holder)
-            return { SetText = function(t) Lbl.Text = t end }
+            return { 
+                SetText = function(t) Lbl.Text = t end,
+                Set = function(t) Lbl.Text = t end
+            }
         end
         Tab.Paragraph = Tab.Label
 
