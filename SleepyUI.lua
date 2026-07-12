@@ -527,7 +527,9 @@ function PulseUI:CreateWindow(config)
         }, Pages)
         local PageLayout = new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8) }, Page)
         PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            Page.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
+            pcall(function()
+                Page.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
+            end)
         end)
 
         local function setActive(entry, active)
@@ -585,8 +587,10 @@ function PulseUI:CreateWindow(config)
 
             local isOpen = false
             CLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                if isOpen then AccFrame.Size = UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 8) end
-                ContentFrame.Size = UDim2.new(1, 0, 0, CLayout.AbsoluteContentSize.Y)
+                pcall(function()
+                    if isOpen then AccFrame.Size = UDim2.new(1, 0, 0, 40 + CLayout.AbsoluteContentSize.Y + 8) end
+                    ContentFrame.Size = UDim2.new(1, 0, 0, CLayout.AbsoluteContentSize.Y)
+                end)
             end)
 
             AccBtn.MouseButton1Click:Connect(function()
