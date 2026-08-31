@@ -6789,10 +6789,11 @@ function PulseUI:CreateWindow(config)
         tabConfig = tabConfig or {}
         local tabTitle = tabConfig.Title or "Tab"
         local tabIcon = tabConfig.Icon or "◈"
+        local layoutOrder = tabConfig.LayoutOrder or 0
 
         local TabBtn = new("TextButton", {
             Size = UDim2.new(1, -16, 0, 34), Position = UDim2.new(0, 8, 0, 0), BackgroundColor3 = Theme.AccentB,
-            BackgroundTransparency = 1, Text = "", ClipsDescendants = true,
+            BackgroundTransparency = 1, Text = "", ClipsDescendants = true, LayoutOrder = layoutOrder,
         }, TabContainer)
         corner(TabBtn, UDim.new(0, 7))
 
@@ -7651,6 +7652,100 @@ function PulseUI:CreateWindow(config)
         return Tab
     end
 
+    --------------------------------------------------------
+    -- Auto Generate Config Tab
+    --------------------------------------------------------
+    if config.EnableConfigTab then
+        local TabConfig = Window:Tab({ Title = "Configuration", Icon = "file-text", LayoutOrder = 9999 })
+        
+        TabConfig:Label("Manage your settings and configurations here.")
+        TabConfig:Divider()
+
+        local configName = "default"
+        local configDropdown
+
+        TabConfig:TextBox({
+            Title = "Config Name",
+            Desc = "Type a name for the config",
+            Placeholder = "farm_config",
+            Callback = function(text)
+                configName = text
+            end
+        })
+
+        configDropdown = TabConfig:Dropdown({
+            Title = "Saved Configs",
+            Desc = "Select a saved config",
+            Values = Window:GetConfigs(),
+            Callback = function(val)
+                configName = val
+            end
+        })
+
+        TabConfig:Toggle({
+            Title = "Auto Load",
+            Desc = "Load this config automatically on startup",
+            Flag = "AutoLoadConfig",
+            Default = false
+        })
+
+        TabConfig:Divider()
+
+        TabConfig:Button({
+            Title = "Refresh Configs",
+            ButtonText = "Refresh",
+            Callback = function()
+                if configDropdown and configDropdown.SetValues then
+                    configDropdown.SetValues(Window:GetConfigs())
+                    Window:Notify("Config", "Config list refreshed.", 2, "success")
+                end
+            end
+        })
+
+        TabConfig:Button({
+            Title = "Save Config",
+            ButtonText = "Save",
+            Callback = function()
+                if configName == "" then return end
+                Window:SaveConfig(configName)
+                if configDropdown and configDropdown.SetValues then
+                    configDropdown.SetValues(Window:GetConfigs())
+                end
+            end
+        })
+
+        TabConfig:Button({
+            Title = "Load Config",
+            ButtonText = "Load",
+            Callback = function()
+                if configName == "" then return end
+                Window:LoadConfig(configName)
+            end
+        })
+
+        TabConfig:Button({
+            Title = "Delete Config",
+            ButtonText = "Delete",
+            Callback = function()
+                if configName == "" then return end
+                Window:DeleteConfig(configName)
+                if configDropdown and configDropdown.SetValues then
+                    configDropdown.SetValues(Window:GetConfigs())
+                end
+            end
+        })
+
+        TabConfig:Divider()
+
+        TabConfig:Button({
+            Title = "Unload UI",
+            ButtonText = "Unload",
+            Callback = function()
+                Window:Destroy()
+            end
+        })
+    end
+
     return Window
 end
 
@@ -7660,6 +7755,11 @@ return PulseUI
 ================================================================
 FULL USAGE EXAMPLE (copy into your own script, not executed here)
 ================================================================
+
+use this to load with github
+local SleepyUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SleepyStar01/StarHub/main/SleepyUI.lua"))()
+
+EXAMPLE:
 
 local PulseUI = loadstring(game:HttpGet("https://yourhost.com/PulseUI.lua"))()
 
