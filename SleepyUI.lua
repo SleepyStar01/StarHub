@@ -6319,6 +6319,7 @@ end
 -- Config persistence (per-flag store, JSON to file if supported)
 --============================================================
 local FlagStore = {}
+local ComponentsRegistry = {}
 
 local function getConfigPath(name)
     local gameName = "Unknown"
@@ -6352,7 +6353,12 @@ local function loadConfig(name)
             if ok then
                 local ok2, decoded = pcall(HttpService.JSONDecode, HttpService, content)
                 if ok2 and type(decoded) == "table" then
-                    for k, v in pairs(decoded) do FlagStore[k] = v end
+                    for k, v in pairs(decoded) do 
+                        FlagStore[k] = v 
+                        if ComponentsRegistry[k] then
+                            pcall(ComponentsRegistry[k], v)
+                        end
+                    end
                     return true
                 end
             end
@@ -7028,6 +7034,7 @@ function PulseUI:CreateWindow(config)
             ClickArea.MouseButton1Click:Connect(function() setState(not state) end)
             if cfg.Flag and FlagStore[cfg.Flag] ~= nil then setState(FlagStore[cfg.Flag], true) end
 
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = setState end
             return { Set = setState, Get = function() return state end }
         end
 
@@ -7509,6 +7516,7 @@ function PulseUI:CreateWindow(config)
 
             refreshOptions()
 
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = function(v) selected = v; DropBtn.Text = selectedText(); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end end
             return {
                 Refresh = function(newValues)
                     selected = (newValues and newValues[1]) or "None"
@@ -7637,6 +7645,7 @@ function PulseUI:CreateWindow(config)
 
             refreshOptions()
 
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = function(v) selected = v; DropBtn.Text = selectedText(); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end end
             return {
                 Refresh = function(newValues)
                     selected = cfg.Default or {}
@@ -7656,6 +7665,7 @@ function PulseUI:CreateWindow(config)
     -- Auto Generate Config Tab
     --------------------------------------------------------
     if config.EnableConfigTab then
+        task.defer(function()
         local TabConfig = Window:Tab({ Title = "Configuration", Icon = "file-text", LayoutOrder = 9999 })
         
         TabConfig:Label("Manage your settings and configurations here.")
@@ -7744,6 +7754,7 @@ function PulseUI:CreateWindow(config)
                 Window:Destroy()
             end
         })
+        end)
     end
 
     return Window
