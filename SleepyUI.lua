@@ -7081,6 +7081,7 @@ function PulseUI:CreateWindow(config)
             end
             refresh()
 
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = setGroup end
             return { Get = function() return selected end, Set = function(v) selected = v; refresh() end }
         end
 
@@ -7153,6 +7154,7 @@ function PulseUI:CreateWindow(config)
                 end
             end)
 
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = setValue end
             return { Set = setValue, Get = function() return val end }
         end
 
@@ -7219,6 +7221,7 @@ function PulseUI:CreateWindow(config)
                 if cfg.Flag then FlagStore[cfg.Flag] = Box.Text end
                 if cfg.Callback then pcall(cfg.Callback, Box.Text) end
             end)
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = function(v) Box.Text = tostring(v); if cfg.Callback then pcall(cfg.Callback, v) end end end
             return { SetText = function(t) Box.Text = tostring(t) end, GetText = function() return Box.Text end }
         end
 
@@ -7252,6 +7255,7 @@ function PulseUI:CreateWindow(config)
                 if cfg.Flag then FlagStore[cfg.Flag] = val end
                 if cfg.Callback then pcall(cfg.Callback, val) end
             end)
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = function(v) val = tonumber(v) or 0; Box.Text = tostring(val); if cfg.Callback then pcall(cfg.Callback, val) end end end
             return { Set = function(n) val = n; Box.Text = tostring(n) end, Get = function() return val end }
         end
 
@@ -7294,6 +7298,7 @@ function PulseUI:CreateWindow(config)
                 end
             end)
 
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = setKey end
             return { Get = function() return current end, Set = function(kc) current = kc; KeyBtn.Text = kc and kc.Name or "None" end }
         end
 
@@ -7379,6 +7384,7 @@ function PulseUI:CreateWindow(config)
                 end
             end)
 
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = function(v) setColor(Color3.fromHex(v), true) end end
             return { Get = function() return color end }
         end
 
@@ -7516,7 +7522,7 @@ function PulseUI:CreateWindow(config)
 
             refreshOptions()
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = function(v) selected = v; DropBtn.Text = selectedText(); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = function(v) selected = v; DropBtn.Text = tostring(v); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end end
             return {
                 Refresh = function(newValues)
                     selected = (newValues and newValues[1]) or "None"
