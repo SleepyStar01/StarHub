@@ -7762,6 +7762,22 @@ function PulseUI:CreateWindow(config)
         })
         end)
     end
+    task.spawn(function()
+        task.wait(0.5)
+        local cName = config.ConfigName or "default"
+        if readfile and isfile then
+            local path = getConfigPath(cName)
+            if isfile(path) then
+                local s, c = pcall(readfile, path)
+                if s then
+                    local s2, d = pcall(HttpService.JSONDecode, HttpService, c)
+                    if s2 and type(d) == "table" and d.AutoLoadConfig == true then
+                        Window:LoadConfig(cName)
+                    end
+                end
+            end
+        end
+    end)
 
     return Window
 end
