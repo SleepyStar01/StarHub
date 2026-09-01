@@ -6345,6 +6345,8 @@ local function saveConfig(name)
     return false, "writefile unsupported"
 end
 
+local isCurrentlyLoading = false
+
 local function loadConfig(name)
     if readfile and isfile and isfolder and makefolder then
         local path = getConfigPath(name)
@@ -6353,12 +6355,14 @@ local function loadConfig(name)
             if ok then
                 local ok2, decoded = pcall(HttpService.JSONDecode, HttpService, content)
                 if ok2 and type(decoded) == "table" then
+                    isCurrentlyLoading = true
                     for k, v in pairs(decoded) do 
                         FlagStore[k] = v 
                         if ComponentsRegistry[k] then
                             pcall(ComponentsRegistry[k], v)
                         end
                     end
+                    isCurrentlyLoading = false
                     return true
                 end
             end
@@ -7702,7 +7706,27 @@ function PulseUI:CreateWindow(config)
             Title = "Auto Load",
             Desc = "Load this config automatically on startup",
             Flag = "AutoLoadConfig",
-            Default = false
+            Default = false,
+            Callback = function(val)
+                if isCurrentlyLoading then return end
+                
+                local _, gamePath = getConfigPath("")
+                local autoPath = gamePath .. "/AutoLoad.txt"
+                
+                if val then
+                    if writefile then
+                        writefile(autoPath, configName)
+                    end
+                    Window:SaveConfig(configName)
+                else
+                    if isfile and isfile(autoPath) and delfile then
+                        delfile(autoPath)
+                    elseif writefile then
+                        writefile(autoPath, "")
+                    end
+                    Window:SaveConfig(configName)
+                end
+            end
         })
 
         TabConfig:Divider()
@@ -7764,14 +7788,14 @@ function PulseUI:CreateWindow(config)
     end
     task.spawn(function()
         task.wait(0.5)
-        local cName = config.ConfigName or "default"
         if readfile and isfile then
-            local path = getConfigPath(cName)
-            if isfile(path) then
-                local s, c = pcall(readfile, path)
-                if s then
-                    local s2, d = pcall(HttpService.JSONDecode, HttpService, c)
-                    if s2 and type(d) == "table" and d.AutoLoadConfig == true then
+            local _, gamePath = getConfigPath("")
+            local autoPath = gamePath .. "/AutoLoad.txt"
+            if isfile(autoPath) then
+                local s, cName = pcall(readfile, autoPath)
+                if s and type(cName) == "string" and cName ~= "" then
+                    local path = gamePath .. "/" .. cName .. ".json"
+                    if isfile(path) then
                         Window:LoadConfig(cName)
                     end
                 end
