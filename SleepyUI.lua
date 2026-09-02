@@ -6504,7 +6504,7 @@ function StarHubUI:CreateWindow(config)
     local function hideWindow()
         isMinimized = true
         tw(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Size = UDim2.new(0, 620, 0, 0) })
-        task.delay(0.3, function() MainFrame.Visible = false end)
+        task.delay(0.3, function() if isMinimized then MainFrame.Visible = false end end)
         MinIcon.Visible = true
         tw(MinIcon, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0.5, -20, 0, 20) })
         closeOverlays()
@@ -6514,7 +6514,7 @@ function StarHubUI:CreateWindow(config)
         MainFrame.Visible = true
         tw(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Size = UDim2.new(0, 620, 0, 400) })
         tw(MinIcon, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), { Position = UDim2.new(0.5, -20, 0, -50) })
-        task.delay(0.3, function() MinIcon.Visible = false end)
+        task.delay(0.3, function() if not isMinimized then MinIcon.Visible = false end end)
     end
     
     MinBtn.MouseButton1Click:Connect(hideWindow)
@@ -7127,7 +7127,7 @@ function StarHubUI:CreateWindow(config)
             local val = cfg.Default or ""
             if cfg.Flag and FlagStore[cfg.Flag] ~= nil then val = FlagStore[cfg.Flag] end
             
-            local Box = new("TextBox", { Size = UDim2.new(0, 150, 0, 26), Position = UDim2.new(1, -164, 0.5, -13), BackgroundColor3 = Theme.ElementAlt, Text = val, PlaceholderText = cfg.Placeholder or "Enter text...", TextColor3 = Theme.Text, PlaceholderColor3 = Theme.TextDim, Font = Enum.Font.BuilderSansMedium, TextSize = 12, ClearTextOnFocus = false }, EFrame)
+            local Box = new("TextBox", { Size = UDim2.new(0, 150, 0, 26), Position = UDim2.new(1, -164, 0.5, -13), BackgroundColor3 = Theme.ElementAlt, Text = val, PlaceholderText = cfg.Placeholder or "Enter text...", TextColor3 = Theme.Text, PlaceholderColor3 = Theme.TextDim, Font = Enum.Font.BuilderSansMedium, TextSize = 12, ClearTextOnFocus = false, ClipsDescendants = true }, EFrame)
             corner(Box, UDim.new(0, 4))
             stroke(Box)
             
@@ -7379,7 +7379,7 @@ function StarHubUI:CreateWindow(config)
                 Lbl.Text = tostring(selected)
                 if cfg.Flag then FlagStore[cfg.Flag] = selected end
                 if silent ~= true and cfg.Callback then safeCall(cfg.Callback, selected) end
-                List.Visible = false
+                closeOverlays()
             end
             
             local function refreshOptions(newValues)
@@ -7498,11 +7498,7 @@ function StarHubUI:CreateWindow(config)
                     local obtn = optionPool[i]
                     if not obtn then
                         obtn = new("TextButton", { Size = UDim2.new(1, 0, 0, 24), BackgroundTransparency = 1, Text = "", Name = "Opt" }, Scroll)
-                        local box = new("Frame", { Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(0, 8, 0.5, -7), BackgroundColor3 = Theme.ElementAlt }, obtn)
-                        corner(box, UDim.new(0, 3))
-                        stroke(box)
-                        local chk = new("ImageLabel", { Size = UDim2.new(1, -4, 1, -4), Position = UDim2.new(0, 2, 0, 2), BackgroundTransparency = 1, Image = "rbxassetid://10709798164", ImageColor3 = Theme.AccentA, ImageTransparency = 1 }, box)
-                        local ol = new("TextLabel", { Size = UDim2.new(1, -30, 1, 0), Position = UDim2.new(0, 30, 0, 0), BackgroundTransparency = 1, TextColor3 = Theme.TextDim, TextSize = 12, Font = Enum.Font.BuilderSansMedium, TextXAlignment = Enum.TextXAlignment.Left }, obtn)
+                        local ol = new("TextLabel", { Size = UDim2.new(1, -20, 1, 0), Position = UDim2.new(0, 10, 0, 0), BackgroundTransparency = 1, TextColor3 = Theme.TextDim, TextSize = 12, Font = Enum.Font.BuilderSansMedium, TextXAlignment = Enum.TextXAlignment.Left }, obtn)
                         
                         addConnection(obtn.MouseButton1Click:Connect(function()
                             local txt = ol.Text
@@ -7510,21 +7506,17 @@ function StarHubUI:CreateWindow(config)
                             if idx then table.remove(selected, idx) else table.insert(selected, txt) end
                             setVals(selected, false)
                             local isSel = table.find(selected, txt) ~= nil
-                            tw(chk, TweenInfo.new(0.2), { ImageTransparency = isSel and 0 or 1 })
-                            ol.TextColor3 = isSel and Theme.Text or Theme.TextDim
+                            ol.TextColor3 = isSel and Theme.AccentA or Theme.TextDim
                         end))
                         table.insert(optionPool, obtn)
                     end
                     
                     local ol = obtn:FindFirstChildOfClass("TextLabel")
-                    local box = obtn:FindFirstChildOfClass("Frame")
-                    local chk = box:FindFirstChildOfClass("ImageLabel")
                     ol.Text = strVal
                     obtn.Visible = true
                     
                     local isSel = table.find(selected, strVal) ~= nil
-                    chk.ImageTransparency = isSel and 0 or 1
-                    ol.TextColor3 = isSel and Theme.Text or Theme.TextDim
+                    ol.TextColor3 = isSel and Theme.AccentA or Theme.TextDim
                     i = i + 1
                 end
             end
