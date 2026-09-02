@@ -1,5 +1,5 @@
 --[[
-    ◆ PulseUI — Roblox UI Framework
+    ◆ StarHubUI — Roblox UI Framework
     Built from scratch. Version 1.0.0 (Final)
 
     A complete, self-contained UI library with its own visual identity
@@ -12,8 +12,8 @@
                Keybind, ColorPicker, ProgressBar, Image
 
     QUICK START (see full example at the very bottom of this file)
-        local PulseUI = loadstring(game:HttpGet("...PulseUI.lua"))()
-        local Window = PulseUI:CreateWindow({ Title = "My Hub" })
+        local StarHubUI = loadstring(game:HttpGet("...StarHubUI.lua"))()
+        local Window = StarHubUI:CreateWindow({ Title = "My Hub" })
         local Tab = Window:Tab({ Title = "Main", Icon = "◈" })
         Tab:Button({ Title = "Say Hi", Callback = function() print("hi") end })
 
@@ -25,8 +25,8 @@
         inside a collapsible section returned by Tab:Section(...).
 ]]
 
-local PulseUI = {}
-PulseUI.__index = PulseUI
+local StarHubUI = {}
+StarHubUI.__index = StarHubUI
 
 --============================================================
 -- Services
@@ -6320,13 +6320,13 @@ end
 --============================================================
 
 -- Global debug flag
-PulseUI.Debug = false
+StarHubUI.Debug = false
 
 local function safeCall(fn, ...)
     if type(fn) ~= "function" then return end
     local ok, err = pcall(fn, ...)
-    if not ok and PulseUI.Debug then
-        warn("[PulseUI] Callback error: " .. tostring(err))
+    if not ok and StarHubUI.Debug then
+        warn("[StarHubUI] Callback error: " .. tostring(err))
     end
 end
 
@@ -6346,7 +6346,7 @@ local function getConfigPath(name)
         end
     end
     
-    local basePath = "PulseUI"
+    local basePath = "StarHub"
     local gamePath = basePath .. "/" .. _cachedGameName
     if not isfolder(basePath) then pcall(makefolder, basePath) end
     if not isfolder(gamePath) then pcall(makefolder, gamePath) end
@@ -6374,7 +6374,7 @@ end
 --============================================================
 -- CreateWindow
 --============================================================
-function PulseUI:CreateWindow(config)
+function StarHubUI:CreateWindow(config)
     config = config or {}
     local Window = {}
     
@@ -6446,7 +6446,7 @@ function PulseUI:CreateWindow(config)
     end))
     
     -- UI hierarchy creation
-    local ScreenGui = new("ScreenGui", { Name = "PulseUI", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui") or CoreGui:FindFirstChild("RobloxGui") or CoreGui)
+    local ScreenGui = new("ScreenGui", { Name = "StarHubUI", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui") or CoreGui:FindFirstChild("RobloxGui") or CoreGui)
     local Overlay = new("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 100, Visible = false, Text = "", AutoButtonColor = false }, ScreenGui)
     
     -- Overlay click logic (shared)
@@ -6490,7 +6490,7 @@ function PulseUI:CreateWindow(config)
     
     local TopBar = new("Frame", { Size = UDim2.new(1, 0, 0, 40), BackgroundColor3 = Theme.Sidebar }, MainFrame)
     local tbLine = new("Frame", { Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 1, -1), BackgroundColor3 = Theme.Border, ZIndex = 2 }, TopBar)
-    local TitleLbl = new("TextLabel", { Size = UDim2.new(0, 200, 1, 0), Position = UDim2.new(0, 15, 0, 0), BackgroundTransparency = 1, Text = config.Title or "PulseUI", TextColor3 = Theme.Text, TextSize = 14, Font = Enum.Font.BuilderSansBold, TextXAlignment = Enum.TextXAlignment.Left }, TopBar)
+    local TitleLbl = new("TextLabel", { Size = UDim2.new(0, 200, 1, 0), Position = UDim2.new(0, 15, 0, 0), BackgroundTransparency = 1, Text = config.Title or "StarHubUI", TextColor3 = Theme.Text, TextSize = 14, Font = Enum.Font.BuilderSansBold, TextXAlignment = Enum.TextXAlignment.Left }, TopBar)
     local subtitle = config.SubTitle or config.Subtitle
     if subtitle then
         TitleLbl.Position = UDim2.new(0, 15, 0, -6)
@@ -6903,8 +6903,8 @@ function PulseUI:CreateWindow(config)
         
         local function unregister(cfg)
             if cfg.Flag then
-                if PulseUI.Debug and ComponentsRegistry[cfg.Flag] ~= nil then
-                    warn("[PulseUI] Duplicate flag overwritten: " .. tostring(cfg.Flag))
+                if StarHubUI.Debug and ComponentsRegistry[cfg.Flag] ~= nil then
+                    warn("[StarHubUI] Duplicate flag overwritten: " .. tostring(cfg.Flag))
                 end
                 FlagStore[cfg.Flag] = nil
                 ComponentsRegistry[cfg.Flag] = nil
@@ -6913,8 +6913,8 @@ function PulseUI:CreateWindow(config)
         
         local function registerFlag(cfg, typeName, setFunc, isListeningFunc)
             if cfg.Flag then
-                if PulseUI.Debug and ComponentsRegistry[cfg.Flag] ~= nil then
-                    warn("[PulseUI] Duplicate flag overwritten: " .. tostring(cfg.Flag))
+                if StarHubUI.Debug and ComponentsRegistry[cfg.Flag] ~= nil then
+                    warn("[StarHubUI] Duplicate flag overwritten: " .. tostring(cfg.Flag))
                 end
                 ComponentsRegistry[cfg.Flag] = { 
                     Type = typeName, 
@@ -7575,7 +7575,7 @@ function PulseUI:CreateWindow(config)
             TabConfig:TextBox({
                 Title = "Config Name",
                 Desc = "Type a name for the config",
-                Placeholder = "farm_config",
+                Placeholder = "default",
                 Callback = function(text) configName = text end
             })
             
@@ -7651,7 +7651,7 @@ function PulseUI:CreateWindow(config)
     return Window
 end
 
-return PulseUI
+return StarHubUI
 
 --[[
 ================================================================
