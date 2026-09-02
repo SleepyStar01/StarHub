@@ -6451,15 +6451,6 @@ function StarHubUI:CreateWindow(config)
     
     -- Overlay click logic (shared)
     local _overlayClickHandler = nil
-    addConnection(Overlay.MouseButton1Click:Connect(function()
-        if _overlayClickHandler then _overlayClickHandler() end
-        closeOverlays()
-    end))
-    
-    local function openOverlay(handler)
-        _overlayClickHandler = handler
-        Overlay.Visible = true
-    end
     
     local function closeOverlays()
         Overlay.Visible = false
@@ -6468,6 +6459,16 @@ function StarHubUI:CreateWindow(config)
             if child:IsA("Frame") then child.Visible = false end
         end
     end
+    
+    local function openOverlay(handler)
+        _overlayClickHandler = handler
+        Overlay.Visible = true
+    end
+
+    addConnection(Overlay.MouseButton1Click:Connect(function()
+        if _overlayClickHandler then _overlayClickHandler() end
+        closeOverlays()
+    end))
     
     local ToastHolder = new("Frame", { Size = UDim2.new(0, 300, 1, -20), Position = UDim2.new(1, -320, 0, 20), BackgroundTransparency = 1 }, ScreenGui)
     new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10), VerticalAlignment = Enum.VerticalAlignment.Bottom }, ToastHolder)
