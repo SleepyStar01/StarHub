@@ -7052,7 +7052,7 @@ function PulseUI:CreateWindow(config)
             ClickArea.MouseButton1Click:Connect(function() setState(not state) end)
             if cfg.Flag and FlagStore[cfg.Flag] ~= nil then setState(FlagStore[cfg.Flag], true) end
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'Toggle\', Func = setState } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'Toggle', Func = setState } end
             return { Set = setState, Get = function() return state end }
         end
 
@@ -7099,7 +7099,7 @@ function PulseUI:CreateWindow(config)
             end
             refresh()
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'Radio\', Func = setGroup } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'Radio', Func = setGroup } end
             return { Get = function() return selected end, Set = function(v) selected = v; refresh() end }
         end
 
@@ -7172,7 +7172,7 @@ function PulseUI:CreateWindow(config)
                 end
             end)
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'Slider\', Func = setValue } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'Slider', Func = setValue } end
             return { Set = setValue, Get = function() return val end }
         end
 
@@ -7239,7 +7239,7 @@ function PulseUI:CreateWindow(config)
                 if cfg.Flag then FlagStore[cfg.Flag] = Box.Text end
                 if cfg.Callback then pcall(cfg.Callback, Box.Text) end
             end)
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'TextBox\', Func = function(v) Box.Text = tostring(v); if cfg.Callback then pcall(cfg.Callback, v) end end } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'TextBox', Func = function(v) Box.Text = tostring(v); if cfg.Callback then pcall(cfg.Callback, v) end end } end
             return { SetText = function(t) Box.Text = tostring(t) end, GetText = function() return Box.Text end }
         end
 
@@ -7273,7 +7273,7 @@ function PulseUI:CreateWindow(config)
                 if cfg.Flag then FlagStore[cfg.Flag] = val end
                 if cfg.Callback then pcall(cfg.Callback, val) end
             end)
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'Input\', Func = function(v) val = tonumber(v) or 0; Box.Text = tostring(val); if cfg.Callback then pcall(cfg.Callback, val) end end } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'Input', Func = function(v) val = tonumber(v) or 0; Box.Text = tostring(val); if cfg.Callback then pcall(cfg.Callback, val) end end } end
             return { Set = function(n) val = n; Box.Text = tostring(n) end, Get = function() return val end }
         end
 
@@ -7316,7 +7316,7 @@ function PulseUI:CreateWindow(config)
                 end
             end)
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'Keybind\', Func = setKey } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'Keybind', Func = setKey } end
             return { Get = function() return current end, Set = function(kc) current = kc; KeyBtn.Text = kc and kc.Name or "None" end }
         end
 
@@ -7402,7 +7402,7 @@ function PulseUI:CreateWindow(config)
                 end
             end)
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'ColorPicker\', Func = function(v) setColor(Color3.fromHex(v), true) end } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'ColorPicker', Func = function(v) setColor(Color3.fromHex(v), true) end } end
             return { Get = function() return color end }
         end
 
@@ -7540,7 +7540,7 @@ function PulseUI:CreateWindow(config)
 
             refreshOptions()
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'Dropdown\', Func = function(v) selected = v; DropBtn.Text = tostring(v); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'Dropdown', Func = function(v) selected = v; DropBtn.Text = tostring(v); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end } end
             return {
                 Refresh = function(newValues)
                     selected = (newValues and newValues[1]) or "None"
@@ -7669,7 +7669,7 @@ function PulseUI:CreateWindow(config)
 
             refreshOptions()
 
-            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = \'MultiDropdown\', Func = function(v) selected = v; DropBtn.Text = selectedText(); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end } end
+            if cfg.Flag then ComponentsRegistry[cfg.Flag] = { Type = 'MultiDropdown', Func = function(v) selected = v; DropBtn.Text = selectedText(); refreshOptions(cfg.Values); if cfg.Callback then pcall(cfg.Callback, v) end end } end
             return {
                 Refresh = function(newValues)
                     selected = cfg.Default or {}
