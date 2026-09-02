@@ -6453,6 +6453,7 @@ function PulseUI:CreateWindow(config)
     local _overlayClickHandler = nil
     addConnection(Overlay.MouseButton1Click:Connect(function()
         if _overlayClickHandler then _overlayClickHandler() end
+        closeOverlays()
     end))
     
     local function openOverlay(handler)
@@ -6645,37 +6646,46 @@ function PulseUI:CreateWindow(config)
     end
     
     local function notify(titleText, text, duration, kind)
-        duration = duration or 3
-        kind = kind or "info"
-        local accent = Theme.AccentA
-        local icon = "rbxassetid://10727915598"
-        if kind == "success" then accent = Theme.Success icon = "rbxassetid://10709798164"
-        elseif kind == "error" then accent = Theme.Error icon = "rbxassetid://10734896206"
-        elseif kind == "warn" then accent = Theme.Warn icon = "rbxassetid://10727932626" end
-        
-        local Toast = new("Frame", { Size = UDim2.new(1, 0, 0, 60), BackgroundColor3 = Theme.Element, BackgroundTransparency = 1 }, ToastHolder)
-        corner(Toast, UDim.new(0, 6))
-        local s = stroke(Toast, Theme.Border)
-        s.Transparency = 1
-        
-        local Ico = new("ImageLabel", { Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0, 15, 0, 15), BackgroundTransparency = 1, Image = icon, ImageColor3 = accent, ImageTransparency = 1 }, Toast)
-        local T = new("TextLabel", { Size = UDim2.new(1, -50, 0, 16), Position = UDim2.new(0, 45, 0, 12), BackgroundTransparency = 1, Text = titleText, TextColor3 = Theme.Text, TextSize = 13, Font = Enum.Font.BuilderSansBold, TextXAlignment = Enum.TextXAlignment.Left, TextTransparency = 1 }, Toast)
-        local D = new("TextLabel", { Size = UDim2.new(1, -50, 0, 14), Position = UDim2.new(0, 45, 0, 32), BackgroundTransparency = 1, Text = text, TextColor3 = Theme.TextDim, TextSize = 11, Font = Enum.Font.BuilderSansMedium, TextXAlignment = Enum.TextXAlignment.Left, TextTransparency = 1, TextWrapped = true, TextYAlignment = Enum.TextYAlignment.Top }, Toast)
-        
-        tw(Toast, TweenInfo.new(0.3), { BackgroundTransparency = 0 })
-        tw(s, TweenInfo.new(0.3), { Transparency = 0 })
-        tw(Ico, TweenInfo.new(0.3), { ImageTransparency = 0 })
-        tw(T, TweenInfo.new(0.3), { TextTransparency = 0 })
-        tw(D, TweenInfo.new(0.3), { TextTransparency = 0 })
-        
+        duration = duration or 4
+        local color = Theme.AccentA
+        if kind == "success" then color = Theme.Success
+        elseif kind == "error" then color = Theme.Error
+        elseif kind == "warn" then color = Theme.Warn end
+
+        local Toast = new("Frame", {
+            Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y,
+            BackgroundColor3 = Theme.Background, BackgroundTransparency = 1, ZIndex = 250, ClipsDescendants = true,
+        }, ToastHolder)
+        corner(Toast, UDim.new(0, 8))
+        local st = stroke(Toast)
+        local Bar = new("Frame", { Size = UDim2.new(0, 3, 1, 0), BackgroundColor3 = color, BackgroundTransparency = 1, ZIndex = 251 }, Toast)
+        padding(Toast, 0, 10, 10, 10)
+
+        local TTitle = new("TextLabel", {
+            Size = UDim2.new(1, -16, 0, 16), Position = UDim2.new(0, 16, 0, 0), BackgroundTransparency = 1, Text = titleText or "Notification",
+            TextColor3 = Theme.Text, TextSize = 13, Font = Enum.Font.BuilderSansBold,
+            TextXAlignment = Enum.TextXAlignment.Left, TextTransparency = 1, ZIndex = 251,
+        }, Toast)
+        local TText = new("TextLabel", {
+            Size = UDim2.new(1, -16, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, Position = UDim2.new(0, 16, 0, 20),
+            BackgroundTransparency = 1, Text = text or "", TextColor3 = Theme.TextDim, TextSize = 11,
+            Font = Enum.Font.BuilderSansMedium, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left,
+            TextTransparency = 1, ZIndex = 251,
+        }, Toast)
+        padding(TText, 0, 0, 0, 4)
+
+        tw(Toast, TweenInfo.new(0.25), { BackgroundTransparency = 0.05 })
+        tw(Bar, TweenInfo.new(0.25), { BackgroundTransparency = 0 })
+        tw(TTitle, TweenInfo.new(0.25), { TextTransparency = 0 })
+        tw(TText, TweenInfo.new(0.25), { TextTransparency = 0 })
+
         task.delay(duration, function()
-            if not Toast.Parent then return end
-            tw(Toast, TweenInfo.new(0.3), { BackgroundTransparency = 1 })
-            tw(s, TweenInfo.new(0.3), { Transparency = 1 })
-            tw(Ico, TweenInfo.new(0.3), { ImageTransparency = 1 })
-            tw(T, TweenInfo.new(0.3), { TextTransparency = 1 })
-            tw(D, TweenInfo.new(0.3), { TextTransparency = 1 })
-            task.delay(0.3, function() Toast:Destroy() end)
+            if not Toast or not Toast.Parent then return end
+            tw(Toast, TweenInfo.new(0.25), { BackgroundTransparency = 1 })
+            tw(Bar, TweenInfo.new(0.25), { BackgroundTransparency = 1 })
+            tw(TTitle, TweenInfo.new(0.25), { TextTransparency = 1 })
+            tw(TText, TweenInfo.new(0.25), { TextTransparency = 1 })
+            task.delay(0.25, function() Toast:Destroy() end)
         end)
     end
     
