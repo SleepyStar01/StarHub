@@ -6408,25 +6408,27 @@ function PulseUI:CreateWindow(config)
     local resizeStart, startSize
     
     addConnection(UserInputService.InputChanged:Connect(function(input)
+        local isMove = (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch)
+        
         -- Active slider / colorpicker
-        if _activeDragger and input.UserInputType == Enum.UserInputType.MouseMovement then
+        if _activeDragger and isMove then
             _activeDragger(input)
         end
         
         -- Window drag
-        if input == dragInput and dragging then
+        if dragging and isMove then
             local delta = input.Position - dragStart
             tw(Window.MainFrame, TweenInfo.new(0.1), { Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y) })
         end
         
         -- MinIcon drag
-        if input == dragMinInput and dragMin then
+        if dragMin and isMove then
             local delta = input.Position - dragMinStart
             tw(Window.MinIcon, TweenInfo.new(0.1), { Position = UDim2.new(startMinPos.X.Scale, startMinPos.X.Offset + delta.X, startMinPos.Y.Scale, startMinPos.Y.Offset + delta.Y) })
         end
         
         -- Window resize
-        if input.UserInputType == Enum.UserInputType.MouseMovement and resizing then
+        if resizing and isMove then
             local delta = input.Position - resizeStart
             local newX = math.clamp(startSize.X.Offset + delta.X, 400, 1000)
             local newY = math.clamp(startSize.Y.Offset + delta.Y, 250, 800)
@@ -6435,21 +6437,22 @@ function PulseUI:CreateWindow(config)
     end))
     
     addConnection(UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             _activeDragger = nil
+            dragging = false
+            dragMin = false
+            resizing = false
         end
     end))
     
     -- UI hierarchy creation
-    local ScreenGui = new("ScreenGui", { Name = "PulseUI", ResetOnSpawn = false }, RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui") or CoreGui:FindFirstChild("RobloxGui") or CoreGui)
-    local Overlay = new("Frame", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 100, Visible = false }, ScreenGui)
+    local ScreenGui = new("ScreenGui", { Name = "PulseUI", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui") or CoreGui:FindFirstChild("RobloxGui") or CoreGui)
+    local Overlay = new("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 100, Visible = false, Text = "", AutoButtonColor = false }, ScreenGui)
     
     -- Overlay click logic (shared)
     local _overlayClickHandler = nil
-    addConnection(Overlay.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            if _overlayClickHandler then _overlayClickHandler() end
-        end
+    addConnection(Overlay.MouseButton1Click:Connect(function()
+        if _overlayClickHandler then _overlayClickHandler() end
     end))
     
     local function openOverlay(handler)
@@ -6549,7 +6552,7 @@ function PulseUI:CreateWindow(config)
         end
     end))
     addConnection(TopBar.InputEnded:Connect(function(input)
-        if input == dragInput then dragging = false end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
     end))
     
     local ResizeBtn = new("Frame", { Size = UDim2.new(0, 15, 0, 15), Position = UDim2.new(1, -15, 1, -15), BackgroundTransparency = 1, ZIndex = 10 }, MainFrame)
@@ -7024,7 +7027,7 @@ function PulseUI:CreateWindow(config)
             if cfg.Flag and FlagStore[cfg.Flag] ~= nil then val = FlagStore[cfg.Flag] end
             val = math.clamp(val, min, max)
             
-            local SliderBg = new("Frame", { Size = UDim2.new(0, 150, 0, 6), Position = UDim2.new(1, -164, 0.5, -3), BackgroundColor3 = Theme.ElementAlt }, EFrame)
+            local SliderBg = new("Frame", { Size = UDim2.new(0, 150, 0, 6), Position = UDim2.new(1, -214, 0.5, -3), BackgroundColor3 = Theme.ElementAlt }, EFrame)
             corner(SliderBg, UDim.new(1, 0))
             stroke(SliderBg)
             
@@ -7330,7 +7333,7 @@ function PulseUI:CreateWindow(config)
         end
         
         local function floatingList()
-            local Frame = new("Frame", { Size = UDim2.new(0, 150, 0, 150), BackgroundColor3 = Theme.Sidebar, Visible = false, ZIndex = 110, ClipsDescendants = true }, Overlay)
+            local Frame = new("Frame", { Size = UDim2.new(0, 150, 0, 150), BackgroundColor3 = Theme.Sidebar, Visible = false, ZIndex = 110, ClipsDescendants = true, Active = true }, Overlay)
             corner(Frame, UDim.new(0, 6))
             stroke(Frame)
             local Search = new("TextBox", { Size = UDim2.new(1, -12, 0, 26), Position = UDim2.new(0, 6, 0, 6), BackgroundColor3 = Theme.Element, Text = "", PlaceholderText = "Search...", TextColor3 = Theme.Text, Font = Enum.Font.BuilderSansMedium, TextSize = 12, ClearTextOnFocus = false }, Frame)
