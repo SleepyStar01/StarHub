@@ -6778,10 +6778,12 @@ function PulseUI:CreateWindow(config)
         corner(tbInd, UDim.new(1, 0))
         local Ico = new("ImageLabel", { Size = UDim2.new(0, 16, 0, 16), Position = UDim2.new(0, 15, 0.5, -8), BackgroundTransparency = 1, ImageColor3 = Theme.TextDim }, TabBtn)
         local iconName = tabConfig.Icon or "list"
-        if Lucide.Icons[iconName] then
-            Ico.Image = Lucide.Texture
-            Ico.ImageRectPosition = Lucide.Icons[iconName].ImageRectPosition
-            Ico.ImageRectSize = Lucide.Icons[iconName].ImageRectSize
+        if Lucide and Lucide.Icons and Lucide.Icons[iconName] then
+            local iconData = Lucide.Icons[iconName]
+            local sheet = Lucide.Spritesheets[tostring(iconData.Image)]
+            Ico.Image = sheet
+            Ico.ImageRectOffset = iconData.ImageRectPosition
+            Ico.ImageRectSize = iconData.ImageRectSize
         else Ico.Image = "rbxassetid://10727915598" end
         local Lbl = new("TextLabel", { Size = UDim2.new(1, -45, 1, 0), Position = UDim2.new(0, 38, 0, 0), BackgroundTransparency = 1, Text = title, TextColor3 = Theme.TextDim, TextSize = 12, Font = Enum.Font.BuilderSansMedium, TextXAlignment = Enum.TextXAlignment.Left }, TabBtn)
         
@@ -6797,7 +6799,8 @@ function PulseUI:CreateWindow(config)
             tw(tbBg, TweenInfo.new(0.2), { BackgroundTransparency = active and 0 or 1 })
             tw(tbInd, TweenInfo.new(0.2), { BackgroundTransparency = active and 0 or 1 })
             tw(Ico, TweenInfo.new(0.2), { ImageColor3 = active and Theme.Text or Theme.TextDim })
-            tw(Lbl, TweenInfo.new(0.2), { TextColor3 = active and Theme.Text or Theme.TextDim, Font = active and Enum.Font.BuilderSansBold or Enum.Font.BuilderSansMedium })
+            tw(Lbl, TweenInfo.new(0.2), { TextColor3 = active and Theme.Text or Theme.TextDim })
+            Lbl.Font = active and Enum.Font.BuilderSansBold or Enum.Font.BuilderSansMedium
         end
         
         addConnection(TabBtn.MouseEnter:Connect(function() if activeTab ~= Tab then tw(tbBg, TweenInfo.new(0.2), { BackgroundTransparency = 0.5 }) end end))
