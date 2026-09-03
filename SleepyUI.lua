@@ -6734,7 +6734,7 @@ function StarHubUI:CreateWindow(config)
             for flag, val in pairs(parsed) do
                 local comp = ComponentsRegistry[flag]
                 if comp and comp.Type ~= 'Toggle' and comp.Type ~= 'Radio' and comp.Type ~= 'Keybind' then
-                    safeCall(comp.Func, val)
+                    safeCall(comp.Func, val, false)
                 end
             end
             
@@ -6742,7 +6742,7 @@ function StarHubUI:CreateWindow(config)
             for flag, val in pairs(parsed) do
                 local comp = ComponentsRegistry[flag]
                 if comp and (comp.Type == 'Toggle' or comp.Type == 'Radio' or comp.Type == 'Keybind') then
-                    safeCall(comp.Func, val)
+                    safeCall(comp.Func, val, false)
                 end
             end
             isCurrentlyLoading = false
@@ -6919,7 +6919,7 @@ function StarHubUI:CreateWindow(config)
                 end
                 ComponentsRegistry[cfg.Flag] = { 
                     Type = typeName, 
-                    Func = function(v) setFunc(v, true) end,
+                    Func = function(v, silent) setFunc(v, silent) end,
                     IsListening = isListeningFunc
                 }
             end
