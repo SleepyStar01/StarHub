@@ -6378,6 +6378,11 @@ function StarHubUI:CreateWindow(config)
     config = config or {}
     local Window = {}
     
+    if getgenv and getgenv().StarHub_Window then
+        pcall(function() getgenv().StarHub_Window:Destroy() end)
+    end
+    if getgenv then getgenv().StarHub_Window = Window end
+    
     local _destroyed = false
     local _connections = {}
     local FlagStore = {}
@@ -6446,7 +6451,14 @@ function StarHubUI:CreateWindow(config)
     end))
     
     -- UI hierarchy creation
-    local ScreenGui = new("ScreenGui", { Name = "StarHubUI", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui") or CoreGui:FindFirstChild("RobloxGui") or CoreGui)
+    local targetContainer = RunService:IsStudio() and Players.LocalPlayer:WaitForChild("PlayerGui") or CoreGui:FindFirstChild("RobloxGui") or CoreGui
+    for _, child in ipairs(targetContainer:GetChildren()) do
+        if child:IsA("ScreenGui") and (child.Name == "StarHubUI" or child.Name == "PulseUI") then
+            pcall(function() child:Destroy() end)
+        end
+    end
+    
+    local ScreenGui = new("ScreenGui", { Name = "StarHubUI", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, targetContainer)
     local Overlay = new("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 100, Visible = false, Text = "", AutoButtonColor = false }, ScreenGui)
     
     -- Overlay click logic (shared)
@@ -6769,11 +6781,24 @@ function StarHubUI:CreateWindow(config)
     function Window:Destroy()
         if _destroyed then return end
         _destroyed = true
+        if Window.OnUnloadCallbacks then
+            for _, cb in ipairs(Window.OnUnloadCallbacks) do pcall(cb) end
+        end
         disconnectAll()
         table.clear(ComponentsRegistry)
         table.clear(FlagStore)
         if ScreenGui and ScreenGui.Parent then
             ScreenGui:Destroy()
+        end
+        if getgenv and getgenv().StarHub_Window == Window then
+            getgenv().StarHub_Window = nil
+        end
+    end
+    
+    function Window:OnUnload(cb)
+        if type(cb) == "function" then
+            if not Window.OnUnloadCallbacks then Window.OnUnloadCallbacks = {} end
+            table.insert(Window.OnUnloadCallbacks, cb)
         end
     end
     
